@@ -7,5 +7,12 @@ namespace SurveyBasket.API.Controllers
     [ApiController]
     public class PollsController : ControllerBase
     {
+        [HttpGet]
+        public IActionResult GetPolls()
+        {
+            // Logic to retrieve polls from the database
+            return Ok(new { Message = "List of polls" });
+        }
+
     }
 }
