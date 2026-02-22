@@ -1,13 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace SurveyBasket.Infrastructure.Persistence
+﻿namespace SurveyBasket.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : DbContext
+    // Use Primary Constructor
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+
         // Define DbSets for your entities here
-        
+        public DbSet<Poll> Polls { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());  
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

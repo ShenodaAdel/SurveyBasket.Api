@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using SurveyBasket.Infrastructure.Persistence;
-
-namespace SurveyBasket.Infrastructure.DependencyInjection
+﻿namespace SurveyBasket.Infrastructure.DependencyInjection
 {
     public static class InfrastructureServiceRegistration
     {
