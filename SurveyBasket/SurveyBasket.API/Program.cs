@@ -1,4 +1,3 @@
-using Mapster;
 using SurveyBasket.Application.DependencyInjection;
 using SurveyBasket.Infrastructure.DependencyInjection;
 
@@ -17,7 +16,6 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMapster();
 
 var app = builder.Build();
 

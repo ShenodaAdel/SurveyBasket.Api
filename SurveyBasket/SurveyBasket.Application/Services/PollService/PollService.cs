@@ -58,9 +58,11 @@
                        messages: messages);
             }
 
+            var response = polls.Items.Adapt<List<PollResponse>>();
+
             messages.Add(new ApiResponseMessage("success", "GAP Types fetched Successfully."));
             return new ApiResponse<object?>(
-            data: new object[] { polls },
+            data: new object[] { response },
             status: StatusCodes.Status200OK,
                        messages: messages)
             { }
