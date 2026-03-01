@@ -61,5 +61,15 @@
             if (poll.Status == 404) return NotFound(poll);
             return BadRequest(poll);
         }
+
+        [HttpPut("{id}/TogglePublishStatus")]
+        public async Task<IActionResult> TogglePublishStatus(int id)
+        {
+            var poll = await _pollService.TogglePublishStatusAsync(id);
+
+            if (poll.Status == 200) return Ok(poll);
+            if (poll.Status == 404) return NotFound(poll);
+            return BadRequest(poll);
+        }
     }
 }

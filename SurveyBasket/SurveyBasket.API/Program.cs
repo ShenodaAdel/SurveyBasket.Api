@@ -1,11 +1,32 @@
-using SurveyBasket.Application.DependencyInjection;
-using SurveyBasket.Infrastructure.DependencyInjection;
+using SurveyBasket.Application.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value.Errors.Count > 0)
+            .SelectMany(x => x.Value.Errors
+                .Select(e => new ApiResponseMessage(
+                    type: "error",
+                    text: e.ErrorMessage,
+                    field: null)))
+            .ToList();
+
+        var response = new ApiResponse<object?>(
+            status: StatusCodes.Status400BadRequest,
+            data: null,
+            messages: errors);
+
+        return new BadRequestObjectResult(response);
+    };
+});
 
 
 builder.Services.AddApplicationServices();
