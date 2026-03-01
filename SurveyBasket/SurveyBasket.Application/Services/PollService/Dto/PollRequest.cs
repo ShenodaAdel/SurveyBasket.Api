@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Application.Services.PollService.Dto
 {
-    public record CreatePollRequest (
+    public record PollRequest (
         string Title,
         string Summary,
         bool Ispublished,

@@ -69,6 +69,60 @@
             ;
         }
 
+        public async Task<ApiResponse<object?>> CreateAsync(PollRequest request)
+        {
+            var messages = new List<ApiResponseMessage>();
+
+            var poll = request.Adapt<Poll>();
+
+            await _unitOfWork.PollRepository.AddAsync(poll);
+            await _unitOfWork.SaveChangesAsync();
+
+            messages.Add(new ApiResponseMessage("success", "Poll Created successfully."));
+            return new ApiResponse<object?>(
+            status: StatusCodes.Status201Created,
+                       messages: messages)
+            { }
+            ;
+        }
+
+        public async Task<ApiResponse<object?>> UpdateAsync(int id , PollRequest request)
+        {
+            var messages = new List<ApiResponseMessage>();
+
+            if (id <= 0 || id == null)
+            {
+                messages.Add(new ApiResponseMessage("validation", "Id", $" Id : {id} Is Required."));
+                return new ApiResponse<object?>(
+                       status: StatusCodes.Status400BadRequest,
+                       messages: messages);
+            }
+
+            var poll = await _unitOfWork.PollRepository.GetByIdAsync(id);
+
+            if (poll == null)
+            {
+                messages.Add(new ApiResponseMessage("error", "Id", $"No Poll found with Id : {id}."));
+                return new ApiResponse<object?>(
+                       status: StatusCodes.Status404NotFound,
+                       messages: messages);
+            }
+
+            poll.Title = request.Title;
+            poll.Summary = request.Summary;
+            poll.StarstAt = request.StarstAt;
+            poll.EndsAt = request.EndsAt;
+
+            await _unitOfWork.PollRepository.Update(poll);
+            await _unitOfWork.SaveChangesAsync();
+
+            messages.Add(new ApiResponseMessage("success", "Poll Updated successfully."));
+            return new ApiResponse<object?>(
+            status: StatusCodes.Status200OK,
+            messages: messages);
+
+        }
+
         public async Task<ApiResponse<object?>> DeleteAsync( int id )
         {
             var messages = new List<ApiResponseMessage>();
