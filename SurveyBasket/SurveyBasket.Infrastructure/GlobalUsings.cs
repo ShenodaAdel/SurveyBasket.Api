@@ -1,4 +1,6 @@
-﻿global using SurveyBasket.Domain.Entities;
+﻿global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Identity;
+global using SurveyBasket.Domain.Entities;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;

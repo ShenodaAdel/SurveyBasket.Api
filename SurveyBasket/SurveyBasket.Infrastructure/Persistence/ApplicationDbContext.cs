@@ -1,7 +1,8 @@
-﻿namespace SurveyBasket.Infrastructure.Persistence
+﻿using SurveyBasket.Infrastructure.Identity;
+namespace SurveyBasket.Infrastructure.Persistence
 {
     // Use Primary Constructor
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
 
         // Define DbSets for your entities here
