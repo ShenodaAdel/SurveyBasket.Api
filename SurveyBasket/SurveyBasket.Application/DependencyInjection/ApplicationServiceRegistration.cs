@@ -1,4 +1,6 @@
-﻿namespace SurveyBasket.Application.DependencyInjection
+﻿using SurveyBasket.Application.Services.Auth;
+
+namespace SurveyBasket.Application.DependencyInjection
 {
     // This class is intended to be used for registering application services in the dependency injection container -> Extension Method.
     public static class ApplicationServiceRegistration
@@ -20,6 +22,7 @@
 
             // 
             services.AddScoped<IPollService, PollService>();
+            services.AddScoped<IAuthService,AuthService>();
 
             return services;
         }
