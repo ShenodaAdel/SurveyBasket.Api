@@ -1,4 +1,5 @@
-﻿namespace SurveyBasket.Infrastructure.Identity
+﻿using Microsoft.AspNetCore.Identity;
+namespace SurveyBasket.Infrastructure.Identity
 {
     public class ApplicationUser : IdentityUser 
     {

@@ -1,4 +1,5 @@
-﻿using SurveyBasket.Infrastructure.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Infrastructure.Identity;
 
 namespace SurveyBasket.Infrastructure.EFUnitOfWork
 {
@@ -7,9 +8,10 @@ namespace SurveyBasket.Infrastructure.EFUnitOfWork
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
             PollRepository = new PollRepository(_context);
             UserRepository = new UserRepository(_userManager);
         }

@@ -7,35 +7,34 @@ namespace SurveyBasket.Application.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<LoginRequest> _validator;
 
-        public AuthService(IUnitOfWork unitOfWork)
+        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator)
         {
             _unitOfWork = unitOfWork;
+            _validator = validator;
         }
 
-        public async Task<ApiResponse<object?>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> GetTokenAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
-            // validation
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                messages.Add(new ApiResponseMessage("validation", "Email", "Email is required."));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages);
-            }
+            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
-            if (string.IsNullOrWhiteSpace(password))
+            if (!validationResult.IsValid)
             {
-                messages.Add(new ApiResponseMessage("validation", "Password", "Password is required."));
+                messages.AddRange(validationResult.Errors.Select(error =>
+                    new ApiResponseMessage("validation", error.PropertyName, error.ErrorMessage)
+                ));
+
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status400BadRequest,
-                    messages: messages);
+                    messages: messages
+                );
             }
 
 
-            var user =  await _unitOfWork.UserRepository.ValidateUserAsync(email,password);
+            var user =  await _unitOfWork.UserRepository.ValidateUserAsync(request.Email, request.Password);
 
             if (user == null) 
             {

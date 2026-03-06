@@ -1,4 +1,5 @@
-﻿using SurveyBasket.Application.Services.Auth.Dtos;
+﻿using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Infrastructure.Identity;
 
 namespace SurveyBasket.Infrastructure.Repositories
