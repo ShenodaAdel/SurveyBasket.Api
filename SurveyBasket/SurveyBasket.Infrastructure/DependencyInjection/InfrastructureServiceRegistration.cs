@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Infrastructure.Identity;
 
 namespace SurveyBasket.Infrastructure.DependencyInjection
@@ -14,11 +15,12 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                 options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection")));
 
-            // Identity setup نفس منطق AddIdentity
+            // Identity setup 
             var builder = services.AddIdentityCore<ApplicationUser>();
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
             builder.AddEntityFrameworkStores<ApplicationDbContext>();   
 
+            services.AddSingleton<IJWTProvider, JWTProvider>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
