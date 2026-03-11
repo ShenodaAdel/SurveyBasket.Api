@@ -1,4 +1,6 @@
-﻿namespace SurveyBasket.API.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

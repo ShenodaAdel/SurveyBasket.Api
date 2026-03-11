@@ -1,5 +1,6 @@
 ﻿
 using SurveyBasket.Application.Services.Auth.Dtos;
+using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Application.Services.Auth
@@ -8,11 +9,13 @@ namespace SurveyBasket.Application.Services.Auth
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<LoginRequest> _validator;
+        private readonly IJWTProvider _jWTProvider; 
 
-        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator)
+        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator , IJWTProvider jWTProvider )
         {
             _unitOfWork = unitOfWork;
             _validator = validator;
+            _jWTProvider = jWTProvider;
         }
 
         public async Task<ApiResponse<object?>> GetTokenAsync(LoginRequest request, CancellationToken cancellationToken = default)
@@ -44,17 +47,21 @@ namespace SurveyBasket.Application.Services.Auth
                     messages: messages);
             }
 
+            var tokenUser = new TokenUserDto
+            {
+                Email = user.Email,
+                Id = user.Id
+            };
 
-
-            // generate jwt token 
+            var (token, expiresIn) =  _jWTProvider.GenerateToken(tokenUser);
 
             var authResponse = new AuthResponse(
                 user.Id,
                 user.Email,
                 user.FirstName,
                 user.LirstName,
-                null,
-                0
+                token,
+                expiresIn
             );
 
             messages.Add(new ApiResponseMessage("success", "Authentication", "User authenticated successfully."));
