@@ -19,6 +19,20 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                     configuration.GetConnectionString("DefaultConnection")));
 
 
+            // Identity setup 
+            var builder = services.AddIdentityCore<ApplicationUser>();
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+            builder.AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+            services.AddOptions<JwtOptions>()
+                .BindConfiguration(JwtOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart(); // if found problem not make Application Run That 's mean stop Application
+
+            var jwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,16 +47,11 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,    
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Sn1bho9sv9zSKTaC0afm3xZBS7E33ifN")),
-                    ValidIssuer = "SurveyBasketApp",
-                    ValidAudience = "SurveyBasketApp Users"
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience
                 };
             });
-
-            // Identity setup 
-            var builder = services.AddIdentityCore<ApplicationUser>();
-            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
-            builder.AddEntityFrameworkStores<ApplicationDbContext>();   
 
             services.AddSingleton<IJWTProvider, JWTProvider>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

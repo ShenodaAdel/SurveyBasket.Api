@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,8 +8,10 @@ using System.Text;
 
 namespace SurveyBasket.Infrastructure.Identity
 {
-    public class JWTProvider : IJWTProvider
+    public class JWTProvider(IOptions<JwtOptions> jwtOptions) : IJWTProvider
     {
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+
         public (string token, int expiresIn) GenerateToken(TokenUserDto user)
         {
             Claim[] claims = [
@@ -19,16 +22,16 @@ namespace SurveyBasket.Infrastructure.Identity
 
             // Link web site i used it to catch Secret key by ssh 256 -> https://acte.ltd/utils/randomkeygen?utm_source=chatgpt.com
             // responsable to Encoding and Decoding
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Sn1bho9sv9zSKTaC0afm3xZBS7E33ifN")); 
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key)); 
 
             // Secret Ket + Algorthims 
             var singingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
-            var expiresIn = 30;
+            var expiresIn = _jwtOptions.ExpiryMinutes;
 
             var token = new JwtSecurityToken(
-                issuer:"SurveyBasketApp", // who create Token 
-                audience : "SurveyBasketApp Users",
+                issuer: _jwtOptions.Issuer, // who create Token 
+                audience : _jwtOptions.Audience,
                 claims : claims,
                 expires : DateTime.UtcNow.AddMinutes(expiresIn),
                 signingCredentials : singingCredentials 
