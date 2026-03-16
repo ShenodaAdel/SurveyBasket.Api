@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SurveyBasket.API.Controllers
 {
@@ -16,12 +16,11 @@ namespace SurveyBasket.API.Controllers
         [HttpGet("GetList")]
         public async Task<IActionResult> GetList()
         {
-            var polls  = await _pollService.GetList();
+            var polls = await _pollService.GetList();
 
-            if(polls.Status == 200) 
+            if (polls.Status == StatusCodes.Status200OK)
                 return Ok(polls);
             return NotFound(polls);
-
         }
 
         [HttpGet("GetById")]
@@ -29,8 +28,8 @@ namespace SurveyBasket.API.Controllers
         {
             var poll = await _pollService.GetById(id);
 
-            if(poll.Status == 200) return Ok(poll);
-            if(poll.Status == 404 ) return NotFound(poll);
+            if (poll.Status == StatusCodes.Status200OK) return Ok(poll);
+            if (poll.Status == StatusCodes.Status404NotFound) return NotFound(poll);
             return BadRequest(poll);
         }
 
@@ -39,18 +38,19 @@ namespace SurveyBasket.API.Controllers
         {
             var poll = await _pollService.CreateAsync(request);
 
-            if (poll.Status == 201) return CreatedAtAction("Create" , poll );
+            if (poll.Status == StatusCodes.Status201Created)
+                return StatusCode(StatusCodes.Status201Created, poll);
 
             return BadRequest(poll);
         }
 
         [HttpPut("Update")]
-        public async Task<IActionResult> UpdateAsync(int id , PollRequest request)
+        public async Task<IActionResult> UpdateAsync(int id, PollRequest request)
         {
-            var poll = await _pollService.UpdateAsync(id , request);
+            var poll = await _pollService.UpdateAsync(id, request);
 
-            if (poll.Status == 200) return Ok(poll);
-            if (poll.Status == 404) return NotFound(poll);
+            if (poll.Status == StatusCodes.Status200OK) return Ok(poll);
+            if (poll.Status == StatusCodes.Status404NotFound) return NotFound(poll);
             return BadRequest(poll);
         }
 
@@ -59,8 +59,8 @@ namespace SurveyBasket.API.Controllers
         {
             var poll = await _pollService.DeleteAsync(id);
 
-            if (poll.Status == 200) return Ok(poll);
-            if (poll.Status == 404) return NotFound(poll);
+            if (poll.Status == StatusCodes.Status200OK) return Ok(poll);
+            if (poll.Status == StatusCodes.Status404NotFound) return NotFound(poll);
             return BadRequest(poll);
         }
 
@@ -69,8 +69,8 @@ namespace SurveyBasket.API.Controllers
         {
             var poll = await _pollService.TogglePublishStatusAsync(id);
 
-            if (poll.Status == 200) return Ok(poll);
-            if (poll.Status == 404) return NotFound(poll);
+            if (poll.Status == StatusCodes.Status200OK) return Ok(poll);
+            if (poll.Status == StatusCodes.Status404NotFound) return NotFound(poll);
             return BadRequest(poll);
         }
     }

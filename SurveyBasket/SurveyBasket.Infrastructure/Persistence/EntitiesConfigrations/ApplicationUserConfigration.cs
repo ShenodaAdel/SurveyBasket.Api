@@ -1,8 +1,8 @@
-﻿using SurveyBasket.Infrastructure.Identity;
+﻿using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
 {
-    public class ApplicationUserConfigration : IEntityTypeConfiguration<ApplicationUser>
+    public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {

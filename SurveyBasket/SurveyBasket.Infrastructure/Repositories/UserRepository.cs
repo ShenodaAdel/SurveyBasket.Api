@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using SurveyBasket.Application.Services.Auth.Dtos;
-using SurveyBasket.Infrastructure.Identity;
+using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository 
+    public class UserRepository : IUserRepository
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -13,13 +13,11 @@ namespace SurveyBasket.Infrastructure.Repositories
             _userManager = userManager;
         }
 
-        // Create Functions 
-
         public async Task<AuthResponse?> ValidateUserAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
-            if (user == null)
+            if (user is null)
                 return null;
 
             var isValidPassword = await _userManager.CheckPasswordAsync(user, password);
@@ -27,31 +25,35 @@ namespace SurveyBasket.Infrastructure.Repositories
             if (!isValidPassword)
                 return null;
 
-            return new AuthResponse {
+            return new AuthResponse
+            {
                 Id = user.Id,
                 Email = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName 
+                LastName = user.LastName
             };
         }
 
-        public async Task AddRefreshToken ( string email , string token , DateTime refreshTokenExpiration)
+        public async Task AddRefreshToken(string email, string token, DateTime refreshTokenExpiration)
         {
-            var user = await _userManager.FindByEmailAsync(email)!;
+            var user = await _userManager.FindByEmailAsync(email);
 
-            user!.RefreshTokens.Add(new RefreshToken
+            if (user is null) return;
+
+            user.RefreshTokens.Add(new RefreshToken
             {
                 Token = token,
                 ExpiresOn = refreshTokenExpiration
             });
-            
         }
 
-        public async Task UpdateUser (string email)
+        public async Task UpdateUser(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email)!;
+            var user = await _userManager.FindByEmailAsync(email);
 
-            await _userManager.UpdateAsync(user!);
+            if (user is null) return;
+
+            await _userManager.UpdateAsync(user);
         }
     }
 }

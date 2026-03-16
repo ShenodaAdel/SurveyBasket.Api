@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using SurveyBasket.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Application.Services.Auth.Dtos;
@@ -62,7 +63,7 @@ namespace SurveyBasket.Infrastructure.Identity
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
 
-                return jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value;
 
             }
             catch
@@ -122,14 +123,14 @@ namespace SurveyBasket.Infrastructure.Identity
 
             var (newtoken, expiresIn) = GenerateToken(tokenUser);
 
-            var newRefreshToken = GenerateRefrshToken();
+            var newRefreshToken = GenerateRefreshToken();
 
             var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
             user.RefreshTokens.Add(new RefreshToken
             {
                 Token = newRefreshToken,
-                ExpiresOn = refreshTokenExpiration
+                ExpiresOn = refreshTokenExpiration,
             });
 
             await _userManager.UpdateAsync(user);
@@ -205,14 +206,14 @@ namespace SurveyBasket.Infrastructure.Identity
 
             await _userManager.UpdateAsync(user);
 
-            messages.Add(new ApiResponseMessage("success", "Authentication", "Revoke refresh token have been successfully renewed."));
+            messages.Add(new ApiResponseMessage("success", "Authentication", "Refresh token has been successfully revoked."));
             return new ApiResponse<object?>(
                 status: StatusCodes.Status200OK,
                 messages: messages
             );
 
         }
-        private static string GenerateRefrshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
     }
 }

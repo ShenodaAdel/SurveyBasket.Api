@@ -1,4 +1,4 @@
-﻿using SurveyBasket.Infrastructure.Identity;
+﻿using SurveyBasket.Domain.Entities;
 namespace SurveyBasket.Infrastructure.Persistence
 {
     // Use Primary Constructor

@@ -1,4 +1,4 @@
-﻿namespace SurveyBasket.Infrastructure.Repositories
+namespace SurveyBasket.Infrastructure.Repositories
 {
     public class PollRepository : IPollRepository
     {
@@ -9,30 +9,35 @@
             _context = context;
         }
 
-        public async Task<Poll> GetByIdAsync (int id)
+        public async Task<Poll?> GetByIdAsync(int id)
         {
-            return await _context.Polls.FirstOrDefaultAsync(p => p.Id == id); 
+            return await _context.Polls.FirstOrDefaultAsync(p => p.Id == id);
         }
+
         public async Task<ApiResponseData<Poll>> GetListAsync()
         {
             var query = _context.Polls.AsQueryable();
-            // make a filteration or pagaination 
 
             var totalRecords = await query.CountAsync();
 
             return new ApiResponseData<Poll>(await query.ToListAsync(), totalRecords);
         }
-        public async Task AddAsync (Poll poll)
+
+        public async Task AddAsync(Poll poll)
         {
             await _context.Polls.AddAsync(poll);
         }
-        public async Task Update (Poll poll)
+
+        public Task Update(Poll poll)
         {
-             _context.Update(poll);
-        } 
-        public async Task Delete (Poll poll)
+            _context.Update(poll);
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(Poll poll)
         {
-             _context.Remove(poll);
+            _context.Remove(poll);
+            return Task.CompletedTask;
         }
     }
 }

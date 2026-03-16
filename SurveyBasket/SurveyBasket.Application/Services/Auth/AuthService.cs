@@ -1,8 +1,6 @@
-﻿
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Domain.Entities;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 
 namespace SurveyBasket.Application.Services.Auth
@@ -12,9 +10,9 @@ namespace SurveyBasket.Application.Services.Auth
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<LoginRequest> _validator;
         private readonly IJWTProvider _jWTProvider;
-        private readonly int _refreshTokenExpiryDays = 30; 
+        private readonly int _refreshTokenExpiryDays = 30;
 
-        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator , IJWTProvider jWTProvider )
+        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator, IJWTProvider jWTProvider)
         {
             _unitOfWork = unitOfWork;
             _validator = validator;
@@ -39,10 +37,9 @@ namespace SurveyBasket.Application.Services.Auth
                 );
             }
 
+            var user = await _unitOfWork.UserRepository.ValidateUserAsync(request.Email, request.Password);
 
-            var user =  await _unitOfWork.UserRepository.ValidateUserAsync(request.Email, request.Password);
-
-            if (user == null) 
+            if (user == null)
             {
                 messages.Add(new ApiResponseMessage("error", "Authentication", "Invalid email or password."));
                 return new ApiResponse<object?>(
@@ -56,18 +53,15 @@ namespace SurveyBasket.Application.Services.Auth
                 Id = user.Id
             };
 
-            var (token, expiresIn) =  _jWTProvider.GenerateToken(tokenUser);
+            var (token, expiresIn) = _jWTProvider.GenerateToken(tokenUser);
 
-            var refreshToken = GenerateRefrshToken();
+            var refreshToken = GenerateRefreshToken();
 
             var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
-            await _unitOfWork.UserRepository.AddRefreshToken(user.Email!, refreshToken , refreshTokenExpiration);
+            await _unitOfWork.UserRepository.AddRefreshToken(user.Email!, refreshToken, refreshTokenExpiration);
             await _unitOfWork.UserRepository.UpdateUser(user.Email!);
             await _unitOfWork.SaveChangesAsync();
-
-            // you need to update user 
-
 
             var authResponse = new AuthResponse
             {
@@ -79,7 +73,6 @@ namespace SurveyBasket.Application.Services.Auth
                 ExpiresIn = expiresIn,
                 RefreshToken = refreshToken,
                 RefreshTokenExpiration = refreshTokenExpiration
-
             };
 
             messages.Add(new ApiResponseMessage("success", "Authentication", "User authenticated successfully."));
@@ -90,6 +83,6 @@ namespace SurveyBasket.Application.Services.Auth
             );
         }
 
-        private static string GenerateRefrshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace SurveyBasket.Domain.Common
+﻿using SurveyBasket.Domain.Entities;
+
+namespace SurveyBasket.Domain.Common
 {
     public abstract class BaseEntity
     {
@@ -7,5 +9,9 @@
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; } = false; // soft delete flag
+        public string CreatedById { get; set; } = string.Empty;
+        public ApplicationUser CreatedBy { get; set; } = default!;
+        public string? UpdatedById { get; set; }
+        public ApplicationUser? UpdatedBy { get; set; }
     }
 }

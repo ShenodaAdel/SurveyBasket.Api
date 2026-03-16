@@ -1,9 +1,9 @@
-﻿namespace SurveyBasket.Application.UnitOfWork
+namespace SurveyBasket.Application.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        IPollRepository PollRepository { get; set; }
-        IUserRepository UserRepository { get; set; }
+        IPollRepository PollRepository { get; }
+        IUserRepository UserRepository { get; }
         Task SaveChangesAsync();
     }
 }

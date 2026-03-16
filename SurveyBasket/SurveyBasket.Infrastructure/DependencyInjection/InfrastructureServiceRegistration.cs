@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Application.Services.Auth.JWT;
+using SurveyBasket.Domain.Entities;
 using SurveyBasket.Infrastructure.Identity;
 using System.Text;
 

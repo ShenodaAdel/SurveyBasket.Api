@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SurveyBasket.Infrastructure.Identity;
+using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.EFUnitOfWork
 {

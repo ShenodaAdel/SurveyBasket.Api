@@ -1,9 +1,9 @@
-﻿namespace SurveyBasket.Application.Services.PollService.Dto
+namespace SurveyBasket.Application.Services.PollService.Dto
 {
-    public record PollRequest (
+    public record PollRequest(
         string Title,
         string Summary,
-        DateOnly StarstAt,
+        DateOnly StartsAt,
         DateOnly EndsAt
-        );
+    );
 }
