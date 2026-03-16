@@ -27,14 +27,31 @@ namespace SurveyBasket.Infrastructure.Repositories
             if (!isValidPassword)
                 return null;
 
-            return new AuthResponse(
-                user.Id,
-                user.Email,
-                user.FirstName,
-                user.LastName,
-                null,
-                0
-            );
+            return new AuthResponse {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName 
+            };
+        }
+
+        public async Task AddRefreshToken ( string email , string token , DateTime refreshTokenExpiration)
+        {
+            var user = await _userManager.FindByEmailAsync(email)!;
+
+            user!.RefreshTokens.Add(new RefreshToken
+            {
+                Token = token,
+                ExpiresOn = refreshTokenExpiration
+            });
+            
+        }
+
+        public async Task UpdateUser (string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email)!;
+
+            await _userManager.UpdateAsync(user!);
         }
     }
 }

@@ -5,5 +5,6 @@ namespace SurveyBasket.Application.Services.Auth
     public interface IAuthService
     {
         Task<ApiResponse<object?>> GetTokenAsync(LoginRequest request, CancellationToken cancellationToken = default);
+        
     }
 }

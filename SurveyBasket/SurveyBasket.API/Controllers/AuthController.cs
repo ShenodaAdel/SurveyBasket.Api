@@ -1,13 +1,15 @@
 ﻿using SurveyBasket.Application.Services.Auth;
 using SurveyBasket.Application.Services.Auth.Dtos;
+using SurveyBasket.Application.Services.Auth.JWT;
 namespace SurveyBasket.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService , IConfiguration configuration) : ControllerBase
+    public class AuthController(IAuthService authService , IJWTProvider jWTProvider) : ControllerBase
     {
         private readonly IAuthService authService = authService;
-        private readonly IConfiguration _configuration = configuration;
+        private readonly IJWTProvider _jWTProvider = jWTProvider;
+
 
         [HttpPost("")]
         public async Task<IActionResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
@@ -17,6 +19,22 @@ namespace SurveyBasket.API.Controllers
             return StatusCode(response.Status, response);
 
         }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _jWTProvider.GetRefreshTokenAsync(request.Token , request.RefreshToken , cancellationToken);
 
+            return StatusCode(response.Status, response);
+
+        }
+
+        [HttpPut("revoke-refresh-token")]
+        public async Task<IActionResult> RevokeRefreshAsync( [FromBody] RefreshTokenRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _jWTProvider.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+
+            return StatusCode(response.Status, response);
+
+        }
     }
 }

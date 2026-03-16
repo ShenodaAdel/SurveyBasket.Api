@@ -53,7 +53,7 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                 };
             });
 
-            services.AddSingleton<IJWTProvider, JWTProvider>();
+            services.AddScoped<IJWTProvider, JWTProvider>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

@@ -2,6 +2,8 @@
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Domain.Entities;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 
 namespace SurveyBasket.Application.Services.Auth
 {
@@ -9,7 +11,8 @@ namespace SurveyBasket.Application.Services.Auth
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<LoginRequest> _validator;
-        private readonly IJWTProvider _jWTProvider; 
+        private readonly IJWTProvider _jWTProvider;
+        private readonly int _refreshTokenExpiryDays = 30; 
 
         public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator , IJWTProvider jWTProvider )
         {
@@ -55,14 +58,29 @@ namespace SurveyBasket.Application.Services.Auth
 
             var (token, expiresIn) =  _jWTProvider.GenerateToken(tokenUser);
 
-            var authResponse = new AuthResponse(
-                user.Id,
-                user.Email,
-                user.FirstName,
-                user.LirstName,
-                token,
-                expiresIn
-            );
+            var refreshToken = GenerateRefrshToken();
+
+            var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
+
+            await _unitOfWork.UserRepository.AddRefreshToken(user.Email!, refreshToken , refreshTokenExpiration);
+            await _unitOfWork.UserRepository.UpdateUser(user.Email!);
+            await _unitOfWork.SaveChangesAsync();
+
+            // you need to update user 
+
+
+            var authResponse = new AuthResponse
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Token = token,
+                ExpiresIn = expiresIn,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = refreshTokenExpiration
+
+            };
 
             messages.Add(new ApiResponseMessage("success", "Authentication", "User authenticated successfully."));
             return new ApiResponse<object?>(
@@ -71,5 +89,7 @@ namespace SurveyBasket.Application.Services.Auth
                 messages: messages
             );
         }
+
+        private static string GenerateRefrshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }
