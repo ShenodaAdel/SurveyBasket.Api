@@ -2,7 +2,7 @@
 {
     public interface IPollRepository
     {
-        Task<Poll> GetByIdAsync(int id);
+        Task<Poll?> GetByIdAsync(int id);
         Task<ApiResponseData<Poll>> GetListAsync();
         Task AddAsync(Poll poll);
         Task Update(Poll poll);

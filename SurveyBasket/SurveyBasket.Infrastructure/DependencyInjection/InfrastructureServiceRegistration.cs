@@ -15,6 +15,8 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
 
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
         {
+            services.AddHttpContextAccessor();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection")));
