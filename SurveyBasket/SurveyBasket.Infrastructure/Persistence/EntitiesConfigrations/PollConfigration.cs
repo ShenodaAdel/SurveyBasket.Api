@@ -14,6 +14,7 @@
             builder.HasOne<ApplicationUser>(x => x.CreatedBy)
                    .WithMany()
                    .HasForeignKey(x => x.CreatedById)
+                   .IsRequired(false)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(x => x.UpdatedById).HasMaxLength(450);

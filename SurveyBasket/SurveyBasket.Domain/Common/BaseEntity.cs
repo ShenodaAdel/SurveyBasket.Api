@@ -9,8 +9,8 @@ namespace SurveyBasket.Domain.Common
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool IsDeleted { get; set; } = false; // soft delete flag
-        public string CreatedById { get; set; } = string.Empty;
-        public ApplicationUser CreatedBy { get; set; } = default!;
+        public string? CreatedById { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
         public string? UpdatedById { get; set; }
         public ApplicationUser? UpdatedBy { get; set; }
     }
