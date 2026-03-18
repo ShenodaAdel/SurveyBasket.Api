@@ -6,6 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options => 
+    options.AddDefaultPolicy( pollcy =>
+        pollcy
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+    )
+);
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -48,6 +57,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// must me put before Authorization
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -21,6 +21,7 @@ namespace SurveyBasket.Infrastructure.Persistence
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var entries = ChangeTracker.Entries<BaseEntity>();
+
             foreach (var entry in entries) 
             {
                 var currentUserId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -35,7 +36,6 @@ namespace SurveyBasket.Infrastructure.Persistence
                     entry.Property(x => x.UpdatedAt).CurrentValue = DateTime.UtcNow;
                 }
             }
-
 
             return base.SaveChangesAsync(cancellationToken);
         }
