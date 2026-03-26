@@ -39,5 +39,14 @@ namespace SurveyBasket.Infrastructure.Repositories
             _context.Remove(poll);
             return Task.CompletedTask;
         }
+
+        public async Task<bool> CheckTitleAsync(string title)
+        {
+            return await _context.Polls.AnyAsync(p => p.Title == title);
+        }
+        public async Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id)
+        {
+            return await _context.Polls.AnyAsync(p => p.Title == title && p.Id != id);
+        }
     }
 }

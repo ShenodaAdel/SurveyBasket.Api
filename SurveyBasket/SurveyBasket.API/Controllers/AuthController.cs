@@ -14,6 +14,7 @@ namespace SurveyBasket.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
+            //throw new Exception("Test Exception Handling Middleware");
             var response = await _authService.GetTokenAsync(request, cancellationToken);
             return StatusCode(response.Status, response);
         }

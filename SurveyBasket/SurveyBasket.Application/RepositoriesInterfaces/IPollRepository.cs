@@ -7,5 +7,7 @@
         Task AddAsync(Poll poll);
         Task Update(Poll poll);
         Task Delete(Poll poll);
+        Task<bool> CheckTitleAsync(string title);
+        Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id);
     }
 }

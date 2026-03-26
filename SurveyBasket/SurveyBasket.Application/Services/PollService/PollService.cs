@@ -84,6 +84,15 @@ namespace SurveyBasket.Application.Services.PollService
                 );
             }
 
+            var isTitleExists = await _unitOfWork.PollRepository.CheckTitleAsync(request.Title);
+            if (isTitleExists)
+            {
+                messages.Add(new ApiResponseMessage("validation", "Title", $"A Poll with the title '{request.Title}' already exists."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status400BadRequest,
+                    messages: messages);
+            }
+
             var poll = request.Adapt<Poll>();
 
             await _unitOfWork.PollRepository.AddAsync(poll);
@@ -114,6 +123,15 @@ namespace SurveyBasket.Application.Services.PollService
                 messages.Add(new ApiResponseMessage("error", "Id", $"No Poll found with Id : {id}."));
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status404NotFound,
+                    messages: messages);
+            }
+
+            var isTitleExists = await _unitOfWork.PollRepository.CheckTitleAndNotTheSamePollAsync(request.Title , id);
+            if (isTitleExists)
+            {
+                messages.Add(new ApiResponseMessage("validation", "Title", $"A Poll with the title '{request.Title}' already exists."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status400BadRequest,
                     messages: messages);
             }
 
