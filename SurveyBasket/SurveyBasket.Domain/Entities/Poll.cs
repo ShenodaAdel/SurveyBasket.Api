@@ -9,5 +9,6 @@ namespace SurveyBasket.Domain.Entities
         public bool IsPublished { get; set; } = false;
         public DateOnly StartsAt { get; set; }
         public DateOnly EndsAt { get; set; }
+        public ICollection<Question> Questions { get; set; } = [];
     }
 }
