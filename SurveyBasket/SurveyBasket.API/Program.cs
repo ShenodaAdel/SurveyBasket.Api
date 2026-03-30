@@ -64,10 +64,10 @@ app.UseHttpsRedirection();
 // must me put before Authorization
 app.UseCors();
 
+app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseExceptionHandler();
 //app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.Run();

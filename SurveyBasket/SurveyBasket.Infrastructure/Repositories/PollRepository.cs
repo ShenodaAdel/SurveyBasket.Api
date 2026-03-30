@@ -28,10 +28,9 @@ namespace SurveyBasket.Infrastructure.Repositories
             await _context.Polls.AddAsync(poll);
         }
 
-        public Task Update(Poll poll)
+        public async Task Update(Poll poll)
         {
-            _context.Update(poll);
-            return Task.CompletedTask;
+            _context.Polls.Update(poll);
         }
 
         public Task Delete(Poll poll)
