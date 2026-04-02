@@ -1,4 +1,5 @@
-﻿namespace SurveyBasket.Application.RepositoriesInterfaces
+﻿
+namespace SurveyBasket.Application.RepositoriesInterfaces
 {
     public interface IPollRepository
     {
@@ -9,5 +10,7 @@
         Task Delete(Poll poll);
         Task<bool> CheckTitleAsync(string title);
         Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id);
+        Task<ApiResponseData<PollResponse>> GetCurrenrtListAsync();
+        Task<bool> CheckIsActiveAsync(int id);
     }
 }

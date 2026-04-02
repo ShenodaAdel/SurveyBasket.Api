@@ -63,7 +63,7 @@ namespace SurveyBasket.Application.Services.Question
                 messages: messages);
         }
 
-        public async Task<ApiResponse<object?>>UpdateAsync(int pollId  , int id , QuestionRequest request)
+        public async Task<ApiResponse<object?>> UpdateAsync(int pollId  , int id , QuestionRequest request)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -150,6 +150,46 @@ namespace SurveyBasket.Application.Services.Question
                 messages: messages);
         }
 
+        public async Task<ApiResponse<object?>> GetAvailableListByPollId( int pollId , string userId )
+        {
+            var messages = new List<ApiResponseMessage>();
+
+            var hasVote = await _unitOfWork.VoteRepository.CheckUserVoted(userId,pollId);
+
+            if (hasVote)
+            {
+                messages.Add(new ApiResponseMessage("error", "User has already voted on this poll."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status400BadRequest,
+                    messages: messages);
+            }
+
+            var pollISExist = await _unitOfWork.PollRepository.CheckIsActiveAsync(pollId);
+
+            if (!pollISExist)
+            {
+                messages.Add(new ApiResponseMessage("error", $"No Active Poll found with id : {pollId}."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status404NotFound,
+                    messages: messages);
+            }
+
+            var questions = await _unitOfWork.QuestionRepository.GetListByPollIdAsync(pollId);
+
+            if (questions.Total == 0)
+            {
+                messages.Add(new ApiResponseMessage("error", "No Questions found."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status404NotFound,
+                    messages: messages);
+            }
+
+            messages.Add(new ApiResponseMessage("success", "Questions fetched successfully."));
+            return new ApiResponse<object?>(
+                data: questions,
+                status: StatusCodes.Status200OK,
+                messages: messages);
+        }
         public async Task<ApiResponse<object?>> GetByPollId(int pollId , int id )
         {
             var messages = new List<ApiResponseMessage>();

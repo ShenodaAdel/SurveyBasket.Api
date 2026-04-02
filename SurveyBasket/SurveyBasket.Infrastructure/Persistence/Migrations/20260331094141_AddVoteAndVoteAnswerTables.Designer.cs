@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyBasket.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SurveyBasket.Infrastructure.Persistence;
 namespace SurveyBasket.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331094141_AddVoteAndVoteAnswerTables")]
+    partial class AddVoteAndVoteAnswerTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -417,7 +420,11 @@ namespace SurveyBasket.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnswerId")
+                    b.Property<string>("AnswerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AnswerId1")
                         .HasColumnType("int");
 
                     b.Property<int>("QuestionId")
@@ -428,7 +435,7 @@ namespace SurveyBasket.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AnswerId");
+                    b.HasIndex("AnswerId1");
 
                     b.HasIndex("QuestionId");
 
@@ -612,7 +619,7 @@ namespace SurveyBasket.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("SurveyBasket.Domain.Entities.Answer", "Answer")
                         .WithMany()
-                        .HasForeignKey("AnswerId")
+                        .HasForeignKey("AnswerId1")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

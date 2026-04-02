@@ -24,6 +24,16 @@ namespace SurveyBasket.API.Controllers
             return NotFound(polls);
         }
 
+        [HttpGet("GetCurrentList")]
+        public async Task<IActionResult> GetCurrentList()
+        {
+            var polls = await _pollService.GetCurrentList();
+
+            if (polls.Status == StatusCodes.Status200OK)
+                return Ok(polls);
+            return NotFound(polls);
+        }
+
         [HttpGet("GetById")]
         public async Task<IActionResult> GetById(int id)
         {

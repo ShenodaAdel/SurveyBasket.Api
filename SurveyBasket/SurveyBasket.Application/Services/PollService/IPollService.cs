@@ -7,6 +7,7 @@ namespace SurveyBasket.Application.Services.PollService
         Task<ApiResponse<object?>> CreateAsync(PollRequest request);
         Task<ApiResponse<object?>> DeleteAsync(int id);
         Task<ApiResponse<object?>> GetById(int id);
+        Task<ApiResponse<object?>> GetCurrentList();
         Task<ApiResponse<object?>> GetList();
         Task<ApiResponse<object?>> TogglePublishStatusAsync(int id);
         Task<ApiResponse<object?>> UpdateAsync(int id, PollRequest request);

@@ -1,3 +1,6 @@
+using Mapster;
+using SurveyBasket.Application.Services.PollService.Dto;
+
 namespace SurveyBasket.Infrastructure.Repositories
 {
     public class PollRepository : IPollRepository
@@ -22,6 +25,18 @@ namespace SurveyBasket.Infrastructure.Repositories
 
             return new ApiResponseData<Poll>(await query.ToListAsync(), totalRecords);
         }
+        public async Task<ApiResponseData<PollResponse>> GetCurrenrtListAsync()
+        {
+            var query = _context.Polls
+                .Where(p => p.IsPublished && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && p.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .AsNoTracking()
+                .ProjectToType<PollResponse>()
+                .AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            return new ApiResponseData<PollResponse>(await query.ToListAsync(), totalRecords);
+        }
 
         public async Task AddAsync(Poll poll)
         {
@@ -39,6 +54,14 @@ namespace SurveyBasket.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
+        public async Task<bool> CheckIsActiveAsync(int id)
+        {
+            return await _context.Polls.AnyAsync( 
+               p => p.Id == id 
+                && p.IsPublished 
+                && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) 
+                && p.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow));
+        }
         public async Task<bool> CheckTitleAsync(string title)
         {
             return await _context.Polls.AnyAsync(p => p.Title == title);

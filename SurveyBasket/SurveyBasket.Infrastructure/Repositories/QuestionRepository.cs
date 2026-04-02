@@ -39,6 +39,13 @@ namespace SurveyBasket.Infrastructure.Repositories
                 && q.Id != id
                 && q.Content == content );
         }
+        public async Task<List<int>> GetActiveQuestionIds(int pollId)
+        {
+            return await _context.Questions
+                .Where(q => q.PollId == pollId && !q.IsDeleted)
+                .Select(q => q.Id)
+                .ToListAsync();
+        }
         public async Task AddAsync(Question question)
         {
             await _context.Questions.AddAsync(question);
@@ -46,12 +53,14 @@ namespace SurveyBasket.Infrastructure.Repositories
         public async Task<ApiResponseData<QuestionResponse>> GetListByPollIdAsync(int pollId)
         {
             var query = _context.Questions
-                .Where(q => q.PollId == pollId)
+                .Where( q => q.PollId == pollId && !q.IsDeleted )
                 .Include(q => q.Answers)
                 .Select(q => new QuestionResponse(
                      q.Id,
                      q.Content,
-                     q.Answers.Select( a => new AnswerResponse ( a.Id , a.Content ))
+                     q.Answers
+                     .Where( a => !a.IsDeleted )
+                     .Select( a => new AnswerResponse ( a.Id , a.Content ))
                     ))
                 .AsNoTracking()
                 .AsQueryable();

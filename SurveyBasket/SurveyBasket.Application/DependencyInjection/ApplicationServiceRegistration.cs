@@ -1,5 +1,6 @@
 ﻿using SurveyBasket.Application.Services.Auth;
 using SurveyBasket.Application.Services.Question;
+using SurveyBasket.Application.Services.Vote;
 
 namespace SurveyBasket.Application.DependencyInjection
 {
@@ -25,6 +26,7 @@ namespace SurveyBasket.Application.DependencyInjection
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IAuthService,AuthService>();
             services.AddScoped<IQuestionService, QuestionService>();
+            services.AddScoped<IVoteService, VoteService>();
 
             return services;
         }

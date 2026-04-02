@@ -15,10 +15,12 @@ namespace SurveyBasket.Infrastructure.EFUnitOfWork
             PollRepository = new PollRepository(_context);
             UserRepository = new UserRepository(_userManager);
             QuestionRepository = new QuestionRepository(_context);
+            VoteRepository = new VoteRepository(_context);
         }
         public IPollRepository PollRepository { get; set; }
         public IUserRepository UserRepository { get; set; }
         public IQuestionRepository QuestionRepository { get; set; }
+        public IVoteRepository VoteRepository { get; set; }
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
