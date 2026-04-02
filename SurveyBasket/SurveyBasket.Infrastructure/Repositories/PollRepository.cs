@@ -1,5 +1,6 @@
 using Mapster;
 using SurveyBasket.Application.Services.PollService.Dto;
+using SurveyBasket.Application.Services.Result.Dtos;
 
 namespace SurveyBasket.Infrastructure.Repositories
 {
@@ -70,5 +71,20 @@ namespace SurveyBasket.Infrastructure.Repositories
         {
             return await _context.Polls.AnyAsync(p => p.Title == title && p.Id != id);
         }
+
+
+
+        // For DashBoard 
+        public async Task<PollVoteResponse?> GetPollVoteResponseAsync(int pollId , CancellationToken cancellationToken = default)
+        {
+            return await _context.Polls
+                .Where(p => p.Id ==  pollId)
+                .Select(p => new PollVoteResponse( p.Title , 
+                        p.Votes.Select(v => new VoteResponse($"{v.User.FirstName} {v.User.LastName}" , v.SubmittedOn , 
+                        v.VoteAnswers.Select(a => new QuestionAnswerResponse(a.Question.Content,a.Answer.Content))
+                        ))
+                )).SingleOrDefaultAsync(cancellationToken);
+        }
+
     }
 }

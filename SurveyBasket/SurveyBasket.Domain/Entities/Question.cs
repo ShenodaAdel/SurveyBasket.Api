@@ -9,5 +9,6 @@ namespace SurveyBasket.Domain.Entities
         // public bool IsActive { get; set; } = true; Because the baseEntity is exist IsDeleted , we don't need IsActive
         public Poll Poll { get; set; } = default!;
         public ICollection<Answer> Answers { get; set; } = [];
+        public ICollection<VoteAnswer> VoteAnswers { get; set; } = [];
     }
 }
