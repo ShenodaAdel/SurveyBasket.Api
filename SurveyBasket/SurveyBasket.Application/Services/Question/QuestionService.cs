@@ -1,14 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
+using SurveyBasket.Application.Services.Caching;
 using SurveyBasket.Application.Services.Question.Dtos;
 using SurveyBasket.Domain.Entities;
 
 
 namespace SurveyBasket.Application.Services.Question
 {
-    public class QuestionService(IUnitOfWork unitOfWork, IValidator<QuestionRequest> validator , TypeAdapterConfig config) : IQuestionService
+    public class QuestionService(IUnitOfWork unitOfWork , ICacheService cacheService
+        , IValidator<QuestionRequest> validator
+        , ILogger<QuestionService> logger
+        , TypeAdapterConfig config) 
+        : IQuestionService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IValidator<QuestionRequest> _validator = validator;
+        private readonly ILogger<QuestionService> _logger = logger;
+        private readonly ICacheService _cacheService = cacheService;
         private readonly TypeAdapterConfig _config = config;
 
         public async Task<ApiResponse<object?>> CreateAsync(int pollId , QuestionRequest request , CancellationToken cancellationToken = default)
@@ -56,6 +64,8 @@ namespace SurveyBasket.Application.Services.Question
 
             await _unitOfWork.QuestionRepository.AddAsync(question);
             await _unitOfWork.SaveChangesAsync();
+
+            await _cacheService.RemoveAsync($"AvailableQuestions_Poll_{pollId}");
 
             messages.Add(new ApiResponseMessage("success", "Question Created successfully."));
             return new ApiResponse<object?>(
@@ -111,6 +121,7 @@ namespace SurveyBasket.Application.Services.Question
                 answer.IsDeleted = request.Answers.Contains(answer.Content);
             });
             await _unitOfWork.SaveChangesAsync();
+            await _cacheService.RemoveAsync($"AvailableQuestions_Poll_{pollId}");
 
             messages.Add(new ApiResponseMessage("success", "Question updated successfully."));
             return new ApiResponse<object?>(
@@ -174,7 +185,21 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
+            var cacheKey = $"AvailableQuestions_Poll_{pollId}";
+
+            var cachedQuestions = await _cacheService.GetAsync<ApiResponseData<QuestionResponse>>(cacheKey);
+            if (cachedQuestions != null)
+            {
+                _logger.LogInformation("Cache hit for key: {CacheKey}. Returning questions from cache.", cacheKey);
+                messages.Add(new ApiResponseMessage("success", "Questions fetched successfully from cache."));
+                return new ApiResponse<object?>(
+                    data: cachedQuestions,
+                    status: StatusCodes.Status200OK,
+                    messages: messages);
+            }
+            _logger.LogInformation("Cache miss for key: {CacheKey}. Fetching questions from database.", cacheKey);
             var questions = await _unitOfWork.QuestionRepository.GetListByPollIdAsync(pollId);
+            await _cacheService.SetAsync(cacheKey, questions);
 
             if (questions.Total == 0)
             {

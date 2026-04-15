@@ -42,6 +42,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 

@@ -4,11 +4,10 @@
     {
         public List<T> Items { get; set; }
         public int Total { get; set; }
-        public ApiResponseData(List<T> _Items, int _Total)
+        public ApiResponseData(List<T> items, int total)
         {
-            Items = _Items;
-            Total = _Total;
-
+            Items = items;
+            Total = total;
         }
     }
 }

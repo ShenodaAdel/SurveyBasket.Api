@@ -1,4 +1,5 @@
 ﻿using SurveyBasket.Application.Services.Auth;
+using SurveyBasket.Application.Services.Caching;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Result;
 using SurveyBasket.Application.Services.Vote;
@@ -23,7 +24,8 @@ namespace SurveyBasket.Application.DependencyInjection
 
 
 
-            // 
+            //
+            services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IAuthService,AuthService>();
             services.AddScoped<IQuestionService, QuestionService>();
