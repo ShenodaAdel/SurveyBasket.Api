@@ -55,5 +55,15 @@ namespace SurveyBasket.Infrastructure.Repositories
 
             await _userManager.UpdateAsync(user);
         }
+
+        public async Task<bool> CheckExistUser(string email, CancellationToken cancellationToken = default)
+        {
+            return await _userManager.Users.AnyAsync(u => u.Email == email, cancellationToken);
+        }
+
+        public async Task<IdentityResult> CreateUserByPasswordAsync(ApplicationUser user, string password)
+        {
+            return await _userManager.CreateAsync(user, password);
+        }
     }
 }
