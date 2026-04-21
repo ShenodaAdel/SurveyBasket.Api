@@ -26,6 +26,21 @@ namespace SurveyBasket.API.Controllers
             return StatusCode(response.Status, response);
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync(RegisterRequest request)
+        {
+            var response = await _authService.RegisterAsync(request);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmailAsync(ConfirmEmailRequest request)
+        {
+            var response = await _authService.ConfirmEmailAsync(request);
+            return StatusCode(response.Status, response);
+        }
+
+
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
         {

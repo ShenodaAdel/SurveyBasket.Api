@@ -34,12 +34,14 @@ namespace SurveyBasket.Infrastructure.Repositories
             };
         }
 
-        public async Task AddRefreshToken(string email, string token, DateTime refreshTokenExpiration)
+        public async Task<ApplicationUser?> GetUserByEmaiAndPasswordlAsync(string email , string password)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user =  await _userManager.FindByEmailAsync(email);
+            return user is not null && await _userManager.CheckPasswordAsync(user, password) ? user : null;
+        }
 
-            if (user is null) return;
-
+        public void AddRefreshToken(ApplicationUser user, string token, DateTime refreshTokenExpiration)
+        {
             user.RefreshTokens.Add(new RefreshToken
             {
                 Token = token,
@@ -56,14 +58,26 @@ namespace SurveyBasket.Infrastructure.Repositories
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task<bool> CheckExistUser(string email, CancellationToken cancellationToken = default)
+        public async Task<bool> CheckExistUser(string email)
         {
-            return await _userManager.Users.AnyAsync(u => u.Email == email, cancellationToken);
+            return await _userManager.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<IdentityResult> CreateUserByPasswordAsync(ApplicationUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
+        }
+        public async Task<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+        public async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token)
+        {
+                return await _userManager.ConfirmEmailAsync(user, token);
         }
     }
 }

@@ -6,9 +6,13 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
     public interface IUserRepository
     {
         Task<AuthResponse?> ValidateUserAsync( string email , string password );
-        Task AddRefreshToken(string email, string token, DateTime refreshTokenExpiration);
+        void AddRefreshToken(ApplicationUser user, string token, DateTime refreshTokenExpiration);
         Task UpdateUser(string email);
-        Task<bool> CheckExistUser(string email, CancellationToken cancellationToken = default);
+        Task<bool> CheckExistUser(string email);
         Task<IdentityResult> CreateUserByPasswordAsync(ApplicationUser user, string password);
+        Task<ApplicationUser?> GetUserByEmaiAndPasswordlAsync(string email, string password);
+        Task<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user);
+        Task<ApplicationUser?> GetUserByIdAsync(string userId);
+        Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token);
     }
 }

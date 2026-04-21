@@ -11,9 +11,12 @@ using System.Text;
 
 namespace SurveyBasket.Infrastructure.Identity
 {
-    public class JWTProvider(IOptions<JwtOptions> jwtOptions , UserManager<ApplicationUser> userManager) : IJWTProvider
+    public class JWTProvider(IOptions<JwtOptions> jwtOptions ,
+        SignInManager<ApplicationUser> signInManager
+        , UserManager<ApplicationUser> userManager) : IJWTProvider
     {
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly int _refreshTokenExpiryDays = 30;
 
@@ -212,6 +215,10 @@ namespace SurveyBasket.Infrastructure.Identity
                 messages: messages
             );
 
+        }
+        public async Task<SignInResult> CheckUserSigninAsync(ApplicationUser user , string password)
+        {
+            return await _signInManager.PasswordSignInAsync(user, password,false,false);
         }
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 

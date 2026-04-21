@@ -22,10 +22,12 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                     configuration.GetConnectionString("DefaultConnection")));
 
 
-            // Identity setup 
+            // Identity setup
             var builder = services.AddIdentityCore<ApplicationUser>();
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
             builder.AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.AddSignInManager();
+            builder.AddDefaultTokenProviders();
 
 
             //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
@@ -59,7 +61,7 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 8;
-                //options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
             });
 

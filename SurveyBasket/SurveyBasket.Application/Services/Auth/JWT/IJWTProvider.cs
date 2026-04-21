@@ -1,4 +1,6 @@
-﻿using SurveyBasket.Application.Services.Auth.Dtos;
+﻿using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Application.Services.Auth.Dtos;
+
 namespace SurveyBasket.Application.Services.Auth.JWT
 {
     public interface IJWTProvider
@@ -8,5 +10,6 @@ namespace SurveyBasket.Application.Services.Auth.JWT
         string? ValidateToken(string  token);
         Task<ApiResponse<object?>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
         Task<ApiResponse<object?>> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
+        Task<SignInResult> CheckUserSigninAsync(ApplicationUser user, string password);
     }
 }
