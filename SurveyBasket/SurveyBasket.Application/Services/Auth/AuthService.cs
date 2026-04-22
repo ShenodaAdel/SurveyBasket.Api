@@ -11,22 +11,14 @@ namespace SurveyBasket.Application.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IValidator<LoginRequest> _validator;
-        private readonly IValidator<RegisterRequest> _registerValidator;
-        private readonly IValidator<ConfirmEmailRequest> _confirmEmailValidator;
         private readonly IJWTProvider _jWTProvider;
         private readonly ILogger<AuthService> _logger;
         private readonly int _refreshTokenExpiryDays = 30;
 
-        public AuthService(IUnitOfWork unitOfWork, IValidator<LoginRequest> validator, 
-            IValidator<ConfirmEmailRequest> confirmEmailValidator,
-            IValidator<RegisterRequest> registerValidator, ILogger<AuthService> logger, IJWTProvider jWTProvider)
+        public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IJWTProvider jWTProvider)
         {
             _unitOfWork = unitOfWork;
-            _validator = validator;
             _jWTProvider = jWTProvider;
-            _registerValidator = registerValidator;
-            _confirmEmailValidator = confirmEmailValidator;
             _logger = logger;
         }
         // Login 
@@ -34,21 +26,7 @@ namespace SurveyBasket.Application.Services.Auth
         {
             var messages = new List<ApiResponseMessage>();
 
-            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                messages.AddRange(validationResult.Errors.Select(error =>
-                    new ApiResponseMessage("validation", error.PropertyName, error.ErrorMessage)
-                ));
-
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages
-                );
-            }
-
-            if (await _unitOfWork.UserRepository.GetUserByEmaiAndPasswordlAsync(request.Email,request.Password) is not { } user) // is not object 
+            if (await _unitOfWork.UserRepository.GetUserByEmaiAndPasswordlAsync(request.Email,request.Password) is not { } user) // is not object
             {
                 messages.Add(new ApiResponseMessage("error", "Authentication", "Invalid email or password."));
                 return new ApiResponse<object?>(
@@ -103,21 +81,9 @@ namespace SurveyBasket.Application.Services.Auth
             }
         }
 
-
         public async Task<ApiResponse<object?>> RegisterAutoAsync(RegisterRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
-            var validationResult = await _registerValidator.ValidateAsync(request, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                messages.AddRange(validationResult.Errors.Select(error =>
-                    new ApiResponseMessage("validation", error.PropertyName, error.ErrorMessage)
-                ));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages
-                );
-            }
 
             var existingUser = await _unitOfWork.UserRepository.CheckExistUser(request.Email);
             if (existingUser)
@@ -187,20 +153,8 @@ namespace SurveyBasket.Application.Services.Auth
         public async Task<ApiResponse<object?>> RegisterAsync(RegisterRequest request)
         {
             var messages = new List<ApiResponseMessage>();
-            var validationResult = await _registerValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                messages.AddRange(validationResult.Errors.Select(error =>
-                    new ApiResponseMessage("validation", error.PropertyName, error.ErrorMessage)
-                ));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages
-                );
-            }
-            _logger.LogInformation("Before CheckExistUser for {Email}", request.Email);
+
             var existingUser = await _unitOfWork.UserRepository.CheckExistUser(request.Email);
-            _logger.LogInformation("After CheckExistUser: {Result}", existingUser);
             if (existingUser)
             {
                 messages.Add(new ApiResponseMessage("error", "Registration", "Email is already in use."));
@@ -242,21 +196,9 @@ namespace SurveyBasket.Application.Services.Auth
 
         }
 
-
         public async Task<ApiResponse<object?>> ConfirmEmailAsync(ConfirmEmailRequest request)
         {
             var messages = new List<ApiResponseMessage>();
-            var validationResult = await _confirmEmailValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                messages.AddRange(validationResult.Errors.Select(error =>
-                    new ApiResponseMessage("validation", error.PropertyName, error.ErrorMessage)
-                ));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages
-                );
-            }
 
             if(await _unitOfWork.UserRepository.GetUserByIdAsync(request.UserId) is not { } user)
             {
@@ -309,7 +251,6 @@ namespace SurveyBasket.Application.Services.Auth
             );
 
         }
-
 
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
