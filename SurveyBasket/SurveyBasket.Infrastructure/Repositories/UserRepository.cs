@@ -79,5 +79,10 @@ namespace SurveyBasket.Infrastructure.Repositories
         {
                 return await _userManager.ConfirmEmailAsync(user, token);
         }
+        public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
+        }
+
     }
 }

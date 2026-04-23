@@ -14,5 +14,6 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user);
         Task<ApplicationUser?> GetUserByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token);
+        Task<ApplicationUser?> GetUserByEmailAsync(string email);
     }
 }

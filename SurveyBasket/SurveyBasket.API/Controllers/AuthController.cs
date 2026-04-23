@@ -40,6 +40,13 @@ namespace SurveyBasket.API.Controllers
             return StatusCode(response.Status, response);
         }
 
+        [HttpPost("resend-confirmation-email")]
+        public async Task<IActionResult> ResendConfirmationEmailAsync(ResendConfirmationEmail request)
+        {
+            var response = await _authService.ResendConfirmationEmailAsync(request);
+            return StatusCode(response.Status, response);
+        }
+
 
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)

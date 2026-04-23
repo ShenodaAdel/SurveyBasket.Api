@@ -252,6 +252,39 @@ namespace SurveyBasket.Application.Services.Auth
 
         }
 
+        public async Task<ApiResponse<object?>> ResendConfirmationEmailAsync(ResendConfirmationEmail request)
+        {
+            var messages = new List<ApiResponseMessage>();
+            // use vaildator 
+
+            if(await _unitOfWork.UserRepository.GetUserByEmailAsync(request.Email) is not { } user)
+            {
+                messages.Add(new ApiResponseMessage("success", "Resend Confirmation Email", "Resend Operation Email Success."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status200OK,
+                    messages: messages);
+            }
+
+            if (user.EmailConfirmed)
+            {
+                messages.Add(new ApiResponseMessage("Failer", "Resend Confirmation Email", "This email is aleardy confirmed."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status400BadRequest,
+                    messages: messages);
+            }
+
+            var code = await _unitOfWork.UserRepository.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            // Send COde to Email 
+
+            messages.Add(new ApiResponseMessage("success", "Resend Confirmation Email", "Resend Operation Email Success. Please check your email for the confirmation code."));
+            return new ApiResponse<object?>(
+                status: StatusCodes.Status200OK,
+                messages: messages);
+
+        }
+
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
 
