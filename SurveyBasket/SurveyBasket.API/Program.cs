@@ -1,3 +1,4 @@
+using Hangfire;
 using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.API.Middleware;
@@ -45,6 +46,15 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+// Add the processing server as IHostedService
+builder.Services.AddHangfireServer();
+
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -75,6 +85,8 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+
+app.UseHangfireDashboard("/jobs");
 
 // must me put before Authorization
 app.UseCors();
