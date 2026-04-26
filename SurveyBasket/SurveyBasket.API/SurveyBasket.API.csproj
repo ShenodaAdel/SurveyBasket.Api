@@ -22,4 +22,10 @@
     <ProjectReference Include="..\SurveyBasket.Infrastructure\SurveyBasket.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Templates\EmailConfirmation.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

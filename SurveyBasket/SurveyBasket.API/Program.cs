@@ -2,7 +2,7 @@ using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.API.Middleware;
 using SurveyBasket.Application.Responses;
-using SurveyBasket.Application.Services.Auth.Email;
+using SurveyBasket.Application.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 

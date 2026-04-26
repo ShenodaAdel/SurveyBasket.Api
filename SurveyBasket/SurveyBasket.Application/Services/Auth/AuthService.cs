@@ -1,26 +1,25 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
+using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Domain.Entities;
 using System.Security.Cryptography;
 using System.Text;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace SurveyBasket.Application.Services.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService(IUnitOfWork unitOfWork , IEmailService emailService, IJWTProvider jWTProvider, ILogger<AuthService> logger) : IAuthService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IJWTProvider _jWTProvider;
-        private readonly ILogger<AuthService> _logger;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IJWTProvider _jWTProvider = jWTProvider;
+        private readonly IEmailService _emailService = emailService;
+        private readonly ILogger<AuthService> _logger = logger;
         private readonly int _refreshTokenExpiryDays = 30;
 
-        public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IJWTProvider jWTProvider)
-        {
-            _unitOfWork = unitOfWork;
-            _jWTProvider = jWTProvider;
-            _logger = logger;
-        }
+    
         // Login 
         public async Task<ApiResponse<object?>> GetTokenAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
@@ -188,6 +187,8 @@ namespace SurveyBasket.Application.Services.Auth
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             _logger.LogInformation("Email confirmation code for user {Email}: {Code}", user.Email, code);
 
+            await SendConfirmationEmail(user, code);
+
             messages.Add(new ApiResponseMessage("success", "Registration", "User registered successfully. Please check your email for the confirmation code."));
             return new ApiResponse<object?>(
                 status: StatusCodes.Status200OK,
@@ -255,7 +256,6 @@ namespace SurveyBasket.Application.Services.Auth
         public async Task<ApiResponse<object?>> ResendConfirmationEmailAsync(ResendConfirmationEmail request)
         {
             var messages = new List<ApiResponseMessage>();
-            // use vaildator 
 
             if(await _unitOfWork.UserRepository.GetUserByEmailAsync(request.Email) is not { } user)
             {
@@ -276,7 +276,7 @@ namespace SurveyBasket.Application.Services.Auth
             var code = await _unitOfWork.UserRepository.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            // Send COde to Email 
+            await SendConfirmationEmail(user, code);
 
             messages.Add(new ApiResponseMessage("success", "Resend Confirmation Email", "Resend Operation Email Success. Please check your email for the confirmation code."));
             return new ApiResponse<object?>(
@@ -287,6 +287,20 @@ namespace SurveyBasket.Application.Services.Auth
 
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
+        private async Task SendConfirmationEmail(ApplicationUser user, string code)
+        {
+            // the frontend must send me a this link 
+            var confirmUrl = $"http://localhost:5173/confirm-email?userId={user.Id}&code={code}";
+
+            var emailBody = EmailBodyBuilder.BuildEmailConfirmationBody("EmailConfirmation",
+                new Dictionary<string, string>
+                {
+                    { "{name}", user.FirstName },
+                    { "{url}", confirmUrl }
+                });
+
+            await _emailService.SendEmailAsync(user.Email!, "Confirm your email", emailBody);
+        }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SurveyBasket.Application.Services.Auth.Email
+﻿namespace SurveyBasket.Application.Services.Email
 {
     public class MailSettings
     {
