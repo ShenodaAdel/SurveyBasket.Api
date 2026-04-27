@@ -57,17 +57,17 @@ namespace SurveyBasket.Infrastructure.Repositories
 
         public async Task<bool> CheckIsActiveAsync(int id)
         {
-            return await _context.Polls.AnyAsync( 
-               p => p.Id == id 
-                && p.IsPublished 
-                && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) 
+            return await _context.Polls.AnyAsync(
+               p => p.Id == id
+                && p.IsPublished
+                && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow)
                 && p.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow));
         }
         public async Task<bool> CheckTitleAsync(string title)
         {
             return await _context.Polls.AnyAsync(p => p.Title == title);
         }
-        public async Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id)
+        public async Task<bool> CheckTitleAndNotTheSamePollAsync(string title, int id)
         {
             return await _context.Polls.AnyAsync(p => p.Title == title && p.Id != id);
         }
@@ -75,16 +75,26 @@ namespace SurveyBasket.Infrastructure.Repositories
 
 
         // For DashBoard 
-        public async Task<PollVoteResponse?> GetPollVoteResponseAsync(int pollId , CancellationToken cancellationToken = default)
+        public async Task<PollVoteResponse?> GetPollVoteResponseAsync(int pollId, CancellationToken cancellationToken = default)
         {
             return await _context.Polls
-                .Where(p => p.Id ==  pollId)
-                .Select(p => new PollVoteResponse( p.Title , 
-                        p.Votes.Select(v => new VoteResponse($"{v.User.FirstName} {v.User.LastName}" , v.SubmittedOn , 
-                        v.VoteAnswers.Select(a => new QuestionAnswerResponse(a.Question.Content,a.Answer.Content))
+                .Where(p => p.Id == pollId)
+                .Select(p => new PollVoteResponse(p.Title,
+                        p.Votes.Select(v => new VoteResponse($"{v.User.FirstName} {v.User.LastName}", v.SubmittedOn,
+                        v.VoteAnswers.Select(a => new QuestionAnswerResponse(a.Question.Content, a.Answer.Content))
                         ))
                 )).SingleOrDefaultAsync(cancellationToken);
         }
-
+        public async Task<List<Poll>> GetAllIsPublished()
+        {
+            return await _context.Polls
+                .Where(p => p.IsPublished && p.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+        public async Task<Poll?> GetById(int pollId)
+        {
+            return await _context.Polls.SingleOrDefaultAsync(p => p.Id == pollId && p.IsPublished);
+        }
     }
 }

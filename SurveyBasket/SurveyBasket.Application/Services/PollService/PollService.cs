@@ -1,15 +1,15 @@
+using Hangfire;
+using SurveyBasket.Application.Services.Notification;
+
 namespace SurveyBasket.Application.Services.PollService
 {
-    public class PollService : IPollService
+    public class PollService(IUnitOfWork unitOfWork, 
+        IValidator<PollRequest> validator,
+        INotificationService notificationService) : IPollService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IValidator<PollRequest> _validator;
-
-        public PollService(IUnitOfWork unitOfWork, IValidator<PollRequest> validator)
-        {
-            _unitOfWork = unitOfWork;
-            _validator = validator;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IValidator<PollRequest> _validator = validator;
+        private readonly INotificationService _notificationService = notificationService;
 
         public async Task<ApiResponse<object?>> GetById(int id)
         {
@@ -226,6 +226,9 @@ namespace SurveyBasket.Application.Services.PollService
             poll.IsPublished = !poll.IsPublished;
             await _unitOfWork.PollRepository.Update(poll);
             await _unitOfWork.SaveChangesAsync();
+
+            if(poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+                BackgroundJob.Enqueue(() => _notificationService.SendNewPollsNotification(poll.Id));
 
             messages.Add(new ApiResponseMessage("success", "Poll publish status updated successfully."));
             return new ApiResponse<object?>(

@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using SurveyBasket.Application.Helpers;
@@ -276,7 +277,7 @@ namespace SurveyBasket.Application.Services.Auth
             var code = await _unitOfWork.UserRepository.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            await SendConfirmationEmail(user, code);
+                await SendConfirmationEmail(user, code);
 
             messages.Add(new ApiResponseMessage("success", "Resend Confirmation Email", "Resend Operation Email Success. Please check your email for the confirmation code."));
             return new ApiResponse<object?>(
@@ -299,7 +300,9 @@ namespace SurveyBasket.Application.Services.Auth
                     { "{url}", confirmUrl }
                 });
 
-            await _emailService.SendEmailAsync(user.Email!, "Confirm your email", emailBody);
+            BackgroundJob.Enqueue(() => _emailService.SendEmailAsync(user.Email!, "Confirm your email", emailBody));
+
+            await Task.CompletedTask;
         }
 
     }

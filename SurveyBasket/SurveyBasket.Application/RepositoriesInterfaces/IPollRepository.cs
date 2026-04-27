@@ -15,5 +15,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<ApiResponseData<PollResponse>> GetCurrenrtListAsync();
         Task<bool> CheckIsActiveAsync(int id);
         Task<PollVoteResponse?> GetPollVoteResponseAsync(int pollId, CancellationToken cancellationToken = default);
+        Task<List<Poll>> GetAllIsPublished();
+        Task<Poll?> GetById(int pollId);
     }
 }
