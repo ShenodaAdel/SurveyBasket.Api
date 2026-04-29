@@ -44,15 +44,14 @@ namespace SurveyBasket.Infrastructure.Repositories
             await _context.Polls.AddAsync(poll);
         }
 
-        public async Task Update(Poll poll)
+        public void Update(Poll poll)
         {
             _context.Polls.Update(poll);
         }
 
-        public Task Delete(Poll poll)
+        public void Delete(Poll poll)
         {
             _context.Remove(poll);
-            return Task.CompletedTask;
         }
 
         public async Task<bool> CheckIsActiveAsync(int id)

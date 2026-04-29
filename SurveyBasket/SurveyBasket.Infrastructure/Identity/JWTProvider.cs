@@ -75,11 +75,11 @@ namespace SurveyBasket.Infrastructure.Identity
             }
         }
 
-        public async Task<ApiResponse<object?>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> GetRefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if (token == null || refreshToken == null)
+            if (request.Token == null || request.RefreshToken == null)
             {
                 messages.Add(new ApiResponseMessage("validation", "Token", "Token and Refresh Token are Required"));
                 return new ApiResponse<object?>(
@@ -87,7 +87,7 @@ namespace SurveyBasket.Infrastructure.Identity
                        messages: messages);
             }
 
-            var userId = ValidateToken(token);
+            var userId = ValidateToken(request.Token);
 
             if (userId == null)
             {
@@ -109,7 +109,7 @@ namespace SurveyBasket.Infrastructure.Identity
                 );
             }
 
-            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken && x.IsActive);
+            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == request.RefreshToken && x.IsActive);
 
             if(userRefreshToken == null )
             {
@@ -160,11 +160,11 @@ namespace SurveyBasket.Infrastructure.Identity
 
         }
 
-        public async Task<ApiResponse<object?>> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> RevokeRefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if (token == null || refreshToken == null)
+            if (request.Token == null || request.RefreshToken == null)
             {
                 messages.Add(new ApiResponseMessage("validation", "Token", "Token and Refresh Token are Required"));
                 return new ApiResponse<object?>(
@@ -172,7 +172,7 @@ namespace SurveyBasket.Infrastructure.Identity
                        messages: messages);
             }
 
-            var userId = ValidateToken(token);
+            var userId = ValidateToken(request.Token);
 
             if (userId == null)
             {
@@ -194,7 +194,7 @@ namespace SurveyBasket.Infrastructure.Identity
                 );
             }
 
-            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken && x.IsActive);
+            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == request.RefreshToken && x.IsActive);
 
             if (userRefreshToken == null)
             {

@@ -269,7 +269,7 @@ namespace SurveyBasket.Application.Services.Question
             }
 
             question.IsDeleted = !question.IsDeleted;
-            await _unitOfWork.QuestionRepository.Update(question);
+            _unitOfWork.QuestionRepository.Update(question);
             await _unitOfWork.SaveChangesAsync();
 
             messages.Add(new ApiResponseMessage("success", "Question status updated successfully."));

@@ -28,12 +28,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.InvalidModelStateResponseFactory = context =>
     {
         var errors = context.ModelState
-            .Where(x => x.Value.Errors.Count > 0)
-            .SelectMany(x => x.Value.Errors
+            .Where(x => x.Value is not null && x.Value.Errors.Count > 0)
+            .SelectMany(x => x.Value!.Errors
                 .Select(e => new ApiResponseMessage(
                     type: "error",
                     text: e.ErrorMessage,
-                    field: null)))
+                    field: x.Key)))
             .ToList();
 
         var response = new ApiResponse<object?>(

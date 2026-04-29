@@ -69,7 +69,7 @@ namespace SurveyBasket.Infrastructure.Repositories
 
             return new ApiResponseData<QuestionResponse>(await query.ToListAsync(), totalRecords);
         }
-        public async Task Update(Question question)
+        public void Update(Question question)
         {
             _context.Questions.Update(question);
         }

@@ -1,9 +1,5 @@
-﻿using SurveyBasket.Application.Services.Auth.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SurveyBasket.Application.Helpers;
+using SurveyBasket.Application.Services.Auth.Dtos;
 
 namespace SurveyBasket.Application.Validations
 {
@@ -17,7 +13,7 @@ namespace SurveyBasket.Application.Validations
 
             RuleFor(x => x.Password)
                .NotEmpty().WithMessage("Password is required.")
-               .Matches(RegexPatterens.PasswordPattern)
+               .Matches(RegexPatterns.PasswordPattern)
                .WithMessage("Password should be at least 8 dights and and should contains Lowercase and UperCase ");
 
             RuleFor(x => x.FirstName)
@@ -28,10 +24,6 @@ namespace SurveyBasket.Application.Validations
                .NotEmpty().WithMessage("LastName is required.")
                .Length(3, 100);
 
-        }
-        public static class RegexPatterens
-        {
-            public const string PasswordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         }
     }
 }

@@ -14,6 +14,6 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<Question?> GetByPollIdAndIdAsync(int pollId, int id);
         Task<QuestionResponse?> GetByPollIdAsync(int pollId, int id);
         Task<ApiResponseData<QuestionResponse>> GetListByPollIdAsync(int pollId);
-        Task Update(Question question);
+        void Update(Question question);
     }
 }

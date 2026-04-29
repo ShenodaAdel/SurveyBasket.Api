@@ -292,11 +292,11 @@ namespace SurveyBasket.Application.Services.Auth
 
         }
 
-        public async Task<ApiResponse<object?>> SendResetPasswordCodeAsync(string email)
+        public async Task<ApiResponse<object?>> SendResetPasswordCodeAsync(ForgetPasswordRequest request)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if (await _userManager.FindByEmailAsync(email) is not { } user || !user.EmailConfirmed)
+            if (await _userManager.FindByEmailAsync(request.Email) is not { } user || !user.EmailConfirmed)
             { 
                 messages.Add(new ApiResponseMessage("Success", "Reset Password", "Check Your Email!"));
                 return new ApiResponse<object?>(
@@ -364,7 +364,7 @@ namespace SurveyBasket.Application.Services.Auth
 
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
-        private async Task SendResetPasswordEmail(ApplicationUser user, string code)
+        private Task SendResetPasswordEmail(ApplicationUser user, string code)
         {
             // the frontend must send me a this link 
             var confirmUrl = _httpContextAccessor.HttpContext!.Request.Headers["Origin"].ToString();
@@ -378,7 +378,7 @@ namespace SurveyBasket.Application.Services.Auth
 
             BackgroundJob.Enqueue(() => _emailService.SendEmailAsync(user.Email!, "✔ Survey Basket: Change Password", emailBody));
 
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         private async Task SendConfirmationEmail(ApplicationUser user, string code)

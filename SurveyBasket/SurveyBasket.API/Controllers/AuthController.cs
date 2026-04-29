@@ -50,7 +50,7 @@ namespace SurveyBasket.API.Controllers
         [HttpPost("forget-password")]
         public async Task<IActionResult> ForgetPasswordAsync([FromBody]ForgetPasswordRequest request)
         {
-            var response = await _authService.SendResetPasswordCodeAsync(request.Email);
+            var response = await _authService.SendResetPasswordCodeAsync(request);
             return StatusCode(response.Status, response);
         }
 
@@ -65,16 +65,16 @@ namespace SurveyBasket.API.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
         {
-            var response = await _jWTProvider.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+            var response = await _jWTProvider.GetRefreshTokenAsync(request, cancellationToken);
             return StatusCode(response.Status, response);
         }
 
         [HttpPut("revoke-refresh-token")]
         public async Task<IActionResult> RevokeRefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken = default)
         {
-            var response = await _jWTProvider.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+            var response = await _jWTProvider.RevokeRefreshTokenAsync(request, cancellationToken);
             return StatusCode(response.Status, response);
-        }
+        }   
     }
 
 }

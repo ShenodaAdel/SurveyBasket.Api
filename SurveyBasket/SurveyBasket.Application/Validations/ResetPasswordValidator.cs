@@ -1,5 +1,5 @@
-﻿using SurveyBasket.Application.Services.Auth.Dtos;
-using static SurveyBasket.Application.Validations.RegisterRequestValidator;
+﻿using SurveyBasket.Application.Helpers;
+using SurveyBasket.Application.Services.Auth.Dtos;
 
 namespace SurveyBasket.Application.Validations
 {
@@ -16,7 +16,7 @@ namespace SurveyBasket.Application.Validations
 
             RuleFor(x => x.NewPassword)
                 .NotEmpty().WithMessage("New password is required.")
-                .Matches(RegexPatterens.PasswordPattern).WithMessage("Password does not meet complexity requirements.");
-        } 
+                .Matches(RegexPatterns.PasswordPattern).WithMessage("Password does not meet complexity requirements.");
+        }
     }
 }

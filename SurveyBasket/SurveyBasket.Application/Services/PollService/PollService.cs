@@ -161,7 +161,7 @@ namespace SurveyBasket.Application.Services.PollService
             poll.StartsAt = request.StartsAt;
             poll.EndsAt = request.EndsAt;
 
-            await _unitOfWork.PollRepository.Update(poll);
+            _unitOfWork.PollRepository.Update(poll);
             await _unitOfWork.SaveChangesAsync();
 
             messages.Add(new ApiResponseMessage("success", "Poll Updated successfully."));
@@ -192,7 +192,7 @@ namespace SurveyBasket.Application.Services.PollService
                     messages: messages);
             }
 
-            await _unitOfWork.PollRepository.Delete(poll);
+            _unitOfWork.PollRepository.Delete(poll);
             await _unitOfWork.SaveChangesAsync();
 
             messages.Add(new ApiResponseMessage("success", "Poll deleted successfully."));
@@ -224,7 +224,7 @@ namespace SurveyBasket.Application.Services.PollService
             }
 
             poll.IsPublished = !poll.IsPublished;
-            await _unitOfWork.PollRepository.Update(poll);
+            _unitOfWork.PollRepository.Update(poll);
             await _unitOfWork.SaveChangesAsync();
 
             if(poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))

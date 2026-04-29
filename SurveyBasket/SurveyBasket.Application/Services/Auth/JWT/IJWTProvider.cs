@@ -8,8 +8,8 @@ namespace SurveyBasket.Application.Services.Auth.JWT
         ( string token , int expiresIn ) GenerateToken(TokenUserDto user);
 
         string? ValidateToken(string  token);
-        Task<ApiResponse<object?>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
-        Task<ApiResponse<object?>> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
+        Task<ApiResponse<object?>> GetRefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default);
+        Task<ApiResponse<object?>> RevokeRefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default);
         Task<SignInResult> CheckUserSigninAsync(ApplicationUser user, string password);
     }
 }
