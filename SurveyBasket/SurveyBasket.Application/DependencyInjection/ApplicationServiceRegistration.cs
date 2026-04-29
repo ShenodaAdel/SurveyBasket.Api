@@ -4,6 +4,7 @@ using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Result;
+using SurveyBasket.Application.Services.Users;
 using SurveyBasket.Application.Services.Vote;
 
 namespace SurveyBasket.Application.DependencyInjection
@@ -35,6 +36,7 @@ namespace SurveyBasket.Application.DependencyInjection
             services.AddScoped<IResultService, ResultService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IUserService , UserService>();
 
             return services;
         }
