@@ -8,24 +8,28 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace SurveyBasket.Infrastructure.Identity
 {
     public class JWTProvider(IOptions<JwtOptions> jwtOptions ,
         SignInManager<ApplicationUser> signInManager
-        , UserManager<ApplicationUser> userManager) : IJWTProvider
+        , UserManager<ApplicationUser> userManager,IUnitOfWork unitOfWork) : IJWTProvider
     {
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly int _refreshTokenExpiryDays = 30;
 
-        public (string token, int expiresIn) GenerateToken(TokenUserDto user)
+        public (string token, int expiresIn) GenerateToken(ApplicationUser user , IEnumerable<string>roles , IEnumerable<string> permissions)
         {
             Claim[] claims = [
                 new (JwtRegisteredClaimNames.Sub, user.Id!),
                 new (JwtRegisteredClaimNames.Email, user.Email!),
-                new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // JWT ID used to -> Prevent Token Reuse
+                new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID used to -> Prevent Token Reuse
+                new(nameof(roles),JsonSerializer.Serialize(roles), JsonClaimValueTypes.JsonArray),
+                new(nameof(permissions),JsonSerializer.Serialize(permissions), JsonClaimValueTypes.JsonArray)
                 ]; // some of cliams you want to add it in token 
 
             // Link web site i used it to catch Secret key by ssh 256 -> https://acte.ltd/utils/randomkeygen?utm_source=chatgpt.com
@@ -122,9 +126,10 @@ namespace SurveyBasket.Infrastructure.Identity
 
             userRefreshToken.RevokedOn = DateTime.UtcNow;
 
-            var tokenUser = new TokenUserDto { Email = user.Email , Id = user.Id };
+            var roles = await _userManager.GetRolesAsync(user);
+            var permissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user,roles);
 
-            var (newtoken, expiresIn) = GenerateToken(tokenUser);
+            var (newtoken, expiresIn) = GenerateToken(user, roles, permissions);
 
             var newRefreshToken = GenerateRefreshToken();
 

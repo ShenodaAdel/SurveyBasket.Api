@@ -1,4 +1,6 @@
-﻿using SurveyBasket.Application.Services.Auth;
+﻿using Microsoft.AspNetCore.Authorization;
+using SurveyBasket.Application.Services.Auth;
+using SurveyBasket.Application.Services.Auth.Filter;
 using SurveyBasket.Application.Services.Caching;
 using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
@@ -25,7 +27,8 @@ namespace SurveyBasket.Application.DependencyInjection
             // add dependency for valifation of DTOs using FluentValidation -> using reflection to scan the assembly for validators.
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceRegistration).Assembly);
 
-
+            services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+            services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
             //
             services.AddScoped<ICacheService, CacheService>();

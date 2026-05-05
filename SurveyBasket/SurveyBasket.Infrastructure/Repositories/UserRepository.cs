@@ -4,14 +4,11 @@ using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository( ApplicationDbContext context, UserManager<ApplicationUser> userManager) : IUserRepository
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
-        public UserRepository(UserManager<ApplicationUser> userManager)
-        {
-            _userManager = userManager;
-        }
 
         public async Task<AuthResponse?> ValidateUserAsync(string email, string password)
         {
@@ -82,6 +79,28 @@ namespace SurveyBasket.Infrastructure.Repositories
         public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+        public async Task<IEnumerable<string>> GetAllPermissionsAsync(ApplicationUser user , IEnumerable<string> roles)
+        {
+            //var userPermissions = await _context.Roles
+            //    .Join(_context.RoleClaims, 
+            //    role => role.Id, 
+            //    Claim => Claim.RoleId, 
+            //    (role, Claim) => new { role, Claim }
+            //    )
+            //    .Where(x => roles.Contains(x.role.Name!))
+            //    .Select(x => x.Claim.ClaimValue!)
+            //    .Distinct()
+            //    .ToListAsync();
+
+            var permissions = await (
+                from r in _context.Roles
+                join rc in _context.RoleClaims on r.Id equals rc.RoleId
+                where roles.Contains(r.Name!)
+                select rc.ClaimValue!
+                ).Distinct().ToListAsync();
+
+            return permissions;
         }
 
     }

@@ -1,20 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
+using SurveyBasket.Application.Helpers;
+using SurveyBasket.Application.Services.Auth.Filter;
 
 namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
-    public class PollsController : ControllerBase
+    public class PollsController(IPollService pollService) : ControllerBase
     {
-        private readonly IPollService _pollService;
-
-        public PollsController(IPollService pollService)
-        {
-            _pollService = pollService;
-        }
+        private readonly IPollService _pollService = pollService;
 
         [HttpGet("GetList")]
+        [HasPermission(Permissions.GetPolls)]
         public async Task<IActionResult> GetList()
         {
             var polls = await _pollService.GetList();
@@ -25,6 +22,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpGet("GetCurrentList")]
+        [Authorize(Roles = DefaultRoles.User)]
         public async Task<IActionResult> GetCurrentList()
         {
             var polls = await _pollService.GetCurrentList();
@@ -35,6 +33,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpGet("GetById")]
+        [HasPermission(Permissions.GetPolls)]
         public async Task<IActionResult> GetById(int id)
         {
             var poll = await _pollService.GetById(id);
@@ -45,6 +44,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpPost("Create")]
+        [HasPermission(Permissions.AddPolls)]
         public async Task<IActionResult> CreateAsync(PollRequest request)
         {
             var poll = await _pollService.CreateAsync(request);
@@ -56,6 +56,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpPut("Update")]
+        [HasPermission(Permissions.UpdatePolls)]
         public async Task<IActionResult> UpdateAsync(int id, PollRequest request)
         {
             var poll = await _pollService.UpdateAsync(id, request);
@@ -66,6 +67,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpDelete("Delete")]
+        [HasPermission(Permissions.DeletePolls)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var poll = await _pollService.DeleteAsync(id);
@@ -76,6 +78,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpPut("{id}/TogglePublishStatus")]
+        [HasPermission(Permissions.UpdatePolls)]
         public async Task<IActionResult> TogglePublishStatus(int id)
         {
             var poll = await _pollService.TogglePublishStatusAsync(id);

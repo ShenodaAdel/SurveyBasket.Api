@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SurveyBasket.Application.Helpers;
+using SurveyBasket.Application.Services.Auth.Filter;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Question.Dtos;
 
@@ -8,11 +10,11 @@ namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
     public class QuestionController(IQuestionService questionService) : ControllerBase
     {
         private readonly IQuestionService _questionService = questionService;
         [HttpPost]
+        [HasPermission(Permissions.AddQuestions)]
         public async Task<IActionResult> CreateAsync( int pollId, [FromBody] QuestionRequest request, CancellationToken cancellationToken = default)
         {
             var result = await _questionService.CreateAsync(pollId, request, cancellationToken);
@@ -22,7 +24,9 @@ namespace SurveyBasket.API.Controllers
                 return NotFound(result);
             return BadRequest(result);
         }
+
         [HttpGet]
+        [HasPermission(Permissions.GetQuestions)]
         public async Task<IActionResult> GetListByPollId(int pollId)
         {
             var result = await _questionService.GetListByPollId(pollId);
@@ -30,7 +34,9 @@ namespace SurveyBasket.API.Controllers
                 return Ok(result);
             return NotFound(result);
         }
+
         [HttpGet("GetByPollId")]
+        [HasPermission(Permissions.GetQuestions)]
         public async Task<IActionResult> GetByPollId(int pollId , int id)
         {
             var result = await _questionService.GetByPollId(pollId , id);
@@ -38,7 +44,9 @@ namespace SurveyBasket.API.Controllers
                 return Ok(result);
             return NotFound(result);
         }
+
         [HttpPut("ToggleStatus")]
+        [HasPermission(Permissions.UpdateQuestions)]
         public async Task<IActionResult> TogglePublishStatus(int pollId , int id)
         {
             var result = await _questionService.ToggleStatusAsync(pollId , id);
@@ -47,7 +55,9 @@ namespace SurveyBasket.API.Controllers
             if (result.Status == StatusCodes.Status404NotFound) return NotFound(result);
             return BadRequest(result);
         }
+
         [HttpPut("Update")]
+        [HasPermission(Permissions.UpdateQuestions)]
         public async Task<IActionResult> UpdateAsync(int pollId, int id , [FromBody]  QuestionRequest request)
         {
             var result = await _questionService.UpdateAsync(pollId, id, request);

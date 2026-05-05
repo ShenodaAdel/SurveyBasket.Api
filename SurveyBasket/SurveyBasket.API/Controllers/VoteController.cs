@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SurveyBasket.API.Extensions;
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Vote;
 using SurveyBasket.Application.Services.Vote.Dtos;
@@ -8,7 +9,7 @@ namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = DefaultRoles.User)]
     public class VoteController(IQuestionService questionService , IVoteService voteService) : ControllerBase
     {
         private readonly IQuestionService _questionService = questionService;

@@ -13,7 +13,7 @@ namespace SurveyBasket.Infrastructure.EFUnitOfWork
             _context = context;
             _userManager = userManager;
             PollRepository = new PollRepository(_context);
-            UserRepository = new UserRepository(_userManager);
+            UserRepository = new UserRepository(_context, _userManager);
             QuestionRepository = new QuestionRepository(_context);
             VoteRepository = new VoteRepository(_context);
         }

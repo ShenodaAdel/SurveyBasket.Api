@@ -24,7 +24,7 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
 
             // Identity setup
             var builder = services.AddIdentityCore<ApplicationUser>();
-            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+            builder = new IdentityBuilder(builder.UserType, typeof(ApplicationRole), services);
             builder.AddEntityFrameworkStores<ApplicationDbContext>();
             builder.AddSignInManager();
             builder.AddDefaultTokenProviders();

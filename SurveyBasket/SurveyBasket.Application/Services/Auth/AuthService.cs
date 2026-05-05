@@ -40,17 +40,13 @@ namespace SurveyBasket.Application.Services.Auth
                     messages: messages);
             }
 
-
-
             if (user.EmailConfirmed)
             {
-                var tokenUser = new TokenUserDto
-                {
-                    Email = user.Email,
-                    Id = user.Id
-                };
+                var userRoles = await _userManager.GetRolesAsync(user);
 
-                var (token, expiresIn) = _jWTProvider.GenerateToken(tokenUser);
+                var userPermissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, userRoles);
+
+                var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles,userPermissions);
 
                 var refreshToken = GenerateRefreshToken();
 
@@ -121,13 +117,10 @@ namespace SurveyBasket.Application.Services.Auth
                 );
             }
 
-            var tokenUser = new TokenUserDto
-            {
-                Email = user.Email,
-                Id = user.Id
-            };
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userPermissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, userRoles);
 
-            var (token, expiresIn) = _jWTProvider.GenerateToken(tokenUser);
+            var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles, userPermissions    );
 
             var refreshToken = GenerateRefreshToken();
 
@@ -251,6 +244,8 @@ namespace SurveyBasket.Application.Services.Auth
                     messages: messages
                 );
             }
+
+            await _userManager.AddToRoleAsync(user, DefaultRoles.User);
 
             messages.Add(new ApiResponseMessage("success", "Email Confirmation", "Email confirmed successfully. You can now log in."));
             return new ApiResponse<object?>(
