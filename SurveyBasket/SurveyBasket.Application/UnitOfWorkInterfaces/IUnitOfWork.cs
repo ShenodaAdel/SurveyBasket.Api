@@ -6,6 +6,7 @@ namespace SurveyBasket.Application.UnitOfWork
         IUserRepository UserRepository { get; }
         IQuestionRepository QuestionRepository { get; }
         IVoteRepository VoteRepository { get; }
+        IRoleRepository RoleRepository { get; }
         Task SaveChangesAsync();
     }
 }

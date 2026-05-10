@@ -23,8 +23,8 @@
 
         public const string Results = "results:get";
 
-        public static IList<string?> GetAllPermissions() => 
-            typeof(Permissions).GetFields().Select(f => f.GetValue(f) as string).ToList();
+        public static IList<string?> GetAllPermissions() =>
+            typeof(Permissions).GetFields().Select(f => f.GetValue(null) as string).ToList();
 
     }
 }

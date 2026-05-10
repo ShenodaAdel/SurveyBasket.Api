@@ -6,6 +6,7 @@ using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Result;
+using SurveyBasket.Application.Services.Role;
 using SurveyBasket.Application.Services.Users;
 using SurveyBasket.Application.Services.Vote;
 
@@ -40,6 +41,7 @@ namespace SurveyBasket.Application.DependencyInjection
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IUserService , UserService>();
+            services.AddScoped<IRoleService, RoleService>();
 
             return services;
         }

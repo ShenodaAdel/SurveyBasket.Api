@@ -23,11 +23,11 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
 
 
             // Identity setup
-            var builder = services.AddIdentityCore<ApplicationUser>();
-            builder = new IdentityBuilder(builder.UserType, typeof(ApplicationRole), services);
-            builder.AddEntityFrameworkStores<ApplicationDbContext>();
-            builder.AddSignInManager();
-            builder.AddDefaultTokenProviders();
+            services.AddIdentityCore<ApplicationUser>()
+                .AddRoles<ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
 
 
             //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
