@@ -18,7 +18,9 @@ namespace SurveyBasket.Application.DependencyInjection
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // mapster configuration for mapping between domain entities and DTOs -> using reflection to scan the assembly for mapping configurations.
-            var config = new TypeAdapterConfig();
+            // Using GlobalSettings so .Adapt<T>() (which reads GlobalSettings) picks up all NewConfig<> registrations
+            // without callers needing to inject TypeAdapterConfig.
+            var config = TypeAdapterConfig.GlobalSettings;
 
             config.Scan(typeof(ApplicationServiceRegistration).Assembly);
 

@@ -7,10 +7,8 @@ using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Domain.Entities;
-using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace SurveyBasket.Application.Services.Auth
 {
@@ -27,12 +25,13 @@ namespace SurveyBasket.Application.Services.Auth
         private readonly int _refreshTokenExpiryDays = 30;
 
 
-        // Login 
+        // Login
         public async Task<ApiResponse<object?>> GetTokenAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if (await _unitOfWork.UserRepository.GetUserByEmaiAndPasswordlAsync(request.Email, request.Password) is not { } user) // is not object
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user is null)
             {
                 messages.Add(new ApiResponseMessage("error", "Authentication", "Invalid email or password."));
                 return new ApiResponse<object?>(
@@ -40,19 +39,27 @@ namespace SurveyBasket.Application.Services.Auth
                     messages: messages);
             }
 
-            if (user.EmailConfirmed)
+            if (user.IsDisabled)
+            {
+                messages.Add(new ApiResponseMessage("error", "Authentication", "Your account has been disabled."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status403Forbidden,
+                    messages: messages);
+            }
+
+            var result = await _jWTProvider.CheckUserSigninAsync(user, request.Password);
+
+            if (result.Succeeded)
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
-
                 var userPermissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, userRoles);
 
-                var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles,userPermissions);
+                var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles, userPermissions);
 
                 var refreshToken = GenerateRefreshToken();
-
                 var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
-                _unitOfWork.UserRepository.AddRefreshToken(user!, refreshToken, refreshTokenExpiration);
+                _unitOfWork.UserRepository.AddRefreshToken(user, refreshToken, refreshTokenExpiration);
                 await _unitOfWork.SaveChangesAsync();
 
                 var authResponse = new AuthResponse
@@ -71,16 +78,28 @@ namespace SurveyBasket.Application.Services.Auth
                 return new ApiResponse<object?>(
                     data: authResponse,
                     status: StatusCodes.Status200OK,
-                    messages: messages
-                );
+                    messages: messages);
             }
-            else
+            if (result.IsNotAllowed)
             {
-                messages.Add(new ApiResponseMessage("error", "Authentication", "User is not allowed to sign in."));
+                messages.Add(new ApiResponseMessage("error", "Authentication", "Email is not confirmed. Please confirm your email before logging in."));
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status403Forbidden,
                     messages: messages);
             }
+            if (result.IsLockedOut)
+            {
+                messages.Add(new ApiResponseMessage("error", "Authentication", "Your account is locked due to multiple failed login attempts. Please try again later."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status403Forbidden,
+                    messages: messages);
+            }
+
+            messages.Add(new ApiResponseMessage("error", "Authentication", "Invalid email or password."));
+            return new ApiResponse<object?>(
+                status: StatusCodes.Status401Unauthorized,
+                messages: messages);
+
         }
 
         public async Task<ApiResponse<object?>> RegisterAutoAsync(RegisterRequest request, CancellationToken cancellationToken = default)

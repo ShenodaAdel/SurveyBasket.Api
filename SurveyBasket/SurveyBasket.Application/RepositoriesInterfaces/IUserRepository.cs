@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SurveyBasket.Application.Services.Auth.Dtos;
+using SurveyBasket.Application.Services.Users.Dtos;
 
 namespace SurveyBasket.Application.RepositoriesInterfaces
 {
@@ -17,5 +18,6 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<ApplicationUser?> GetUserByEmailAsync(string email);
 
         Task<IEnumerable<string>>GetAllPermissionsAsync(ApplicationUser user, IEnumerable<string> roles);
+        Task<IEnumerable<UserResponse>> GetAllAsync();
     }
 }

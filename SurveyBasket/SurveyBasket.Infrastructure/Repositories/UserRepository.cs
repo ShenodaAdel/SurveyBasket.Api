@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Dtos;
+using SurveyBasket.Application.Services.Users.Dtos;
 using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Repositories
@@ -103,5 +105,34 @@ namespace SurveyBasket.Infrastructure.Repositories
             return permissions;
         }
 
+        public async Task<IEnumerable<UserResponse>> GetAllAsync()
+        {
+            return await (
+                from u in _context.Users
+                join ur in _context.UserRoles 
+                on u.Id equals ur.UserId
+                join r in _context.Roles 
+                on ur.RoleId equals r.Id into roles
+                where !roles.Any(role => role.Name == DefaultRoles.User)
+                select new
+                {
+                    u.Id,
+                    u.FirstName,
+                    u.LastName,
+                    u.Email,
+                    u.IsDisabled,
+                    Roles = roles.Select(role => role.Name!).ToList()
+                })
+                .GroupBy( u => new { u.Id , u.FirstName ,u.LastName , u.Email , u.IsDisabled})
+                .Select(u => new UserResponse
+                    (
+                        u.Key.Id,
+                        u.Key.FirstName,
+                        u.Key.LastName,
+                        u.Key.Email,
+                        u.Key.IsDisabled,
+                        u.SelectMany(r => r.Roles)
+                    )).ToListAsync();
+        } 
     }
 }

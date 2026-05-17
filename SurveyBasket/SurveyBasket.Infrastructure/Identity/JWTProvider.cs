@@ -104,11 +104,30 @@ namespace SurveyBasket.Infrastructure.Identity
 
             var user = await _userManager.FindByIdAsync(userId);
             
-            if(user == null)
+            if (user == null)
             {
                 messages.Add(new ApiResponseMessage("error", "User", "User associated with the provided token does not exist."));
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status404NotFound,
+                    messages: messages
+                );
+            }
+
+            if (user.IsDisabled)
+            {
+                messages.Add(new ApiResponseMessage("error", "User", "User account is disabled. Please contact support."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status403Forbidden,
+                    messages: messages
+                );
+            }
+
+            if (user.LockoutEnd > DateTime.UtcNow)
+            {
+                var lockoutTimeRemaining = user.LockoutEnd.Value - DateTime.UtcNow;
+                messages.Add(new ApiResponseMessage("error", "User", $"User account is locked. Try again in {lockoutTimeRemaining.Minutes} minutes and {lockoutTimeRemaining.Seconds} seconds."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status403Forbidden,
                     messages: messages
                 );
             }
@@ -221,9 +240,14 @@ namespace SurveyBasket.Infrastructure.Identity
             );
 
         }
-        public async Task<SignInResult> CheckUserSigninAsync(ApplicationUser user , string password)
+        public async Task<SignInResult> CheckUserSigninAsync(ApplicationUser user, string password)
         {
-            return await _signInManager.PasswordSignInAsync(user, password,false,false);
+            // Must be CheckPasswordSignInAsync, NOT PasswordSignInAsync.
+            // PasswordSignInAsync issues a cookie under the "Identity.Application" scheme, which isn't registered
+            // in a JWT-only API and causes: "No sign-in authentication handlers are registered."
+            // CheckPasswordSignInAsync runs the same password + pre-sign-in (EmailConfirmed, lockout) checks
+            // and returns SignInResult without creating any cookie/principal.
+            return await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
         }
         private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
