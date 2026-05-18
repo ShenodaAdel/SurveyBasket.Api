@@ -16,10 +16,10 @@ namespace SurveyBasket.API.Controllers
         private readonly IVoteService _voteService = voteService;
 
         [HttpGet("GetListAvaibale/{pollid}")]
-        public async Task<IActionResult> GetAvaibalePoll([FromRoute]int pollId)
+        public async Task<IActionResult> GetAvaibalePoll([FromRoute]int pollId,[FromQuery] RequestFillters fillters)
         {
             var userId = User.GetUserId();
-            var result = await _questionService.GetAvailableListByPollId(pollId, userId!);
+            var result = await _questionService.GetAvailableListByPollId(pollId, userId!,fillters);
 
             if(result.Status == 200) return Ok(result);
             else if (result.Status == 404) return NotFound(result);

@@ -1,6 +1,8 @@
 ﻿using Mapster;
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Answer.Dros;
 using SurveyBasket.Application.Services.Question.Dtos;
+using System.Linq.Dynamic.Core;
 
 namespace SurveyBasket.Infrastructure.Repositories
 {
@@ -50,24 +52,26 @@ namespace SurveyBasket.Infrastructure.Repositories
         {
             await _context.Questions.AddAsync(question);
         }
-        public async Task<ApiResponseData<QuestionResponse>> GetListByPollIdAsync(int pollId)
+        public IQueryable<QuestionResponse> GetListByPollId(int pollId, RequestFillters fillters)
         {
             var query = _context.Questions
-                .Where( q => q.PollId == pollId && !q.IsDeleted )
+                .Where(q => q.PollId == pollId && !q.IsDeleted);
+
+            if (!string.IsNullOrEmpty(fillters.SearchValue))
+            {
+                query.Where(q => q.Content.Contains(fillters.SearchValue));
+            }
+
+            if (!string.IsNullOrEmpty(fillters.SortColumn))
+            {
+                query.OrderBy($"{fillters.SortColumn} {fillters.SortDirection}");
+            }
+
+            var source = query
                 .Include(q => q.Answers)
-                .Select(q => new QuestionResponse(
-                     q.Id,
-                     q.Content,
-                     q.Answers
-                     .Where( a => !a.IsDeleted )
-                     .Select( a => new AnswerResponse ( a.Id , a.Content ))
-                    ))
-                .AsNoTracking()
-                .AsQueryable();
-
-            var totalRecords = await query.CountAsync();
-
-            return new ApiResponseData<QuestionResponse>(await query.ToListAsync(), totalRecords);
+                .ProjectToType<QuestionResponse>()
+                .AsNoTracking();
+            return source;
         }
         public void Update(Question question)
         {

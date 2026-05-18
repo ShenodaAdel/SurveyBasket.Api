@@ -27,9 +27,9 @@ namespace SurveyBasket.API.Controllers
 
         [HttpGet]
         [HasPermission(Permissions.GetQuestions)]
-        public async Task<IActionResult> GetListByPollId(int pollId)
+        public async Task<IActionResult> GetListByPollId(int pollId , [FromBody] RequestFillters fillters)
         {
-            var result = await _questionService.GetListByPollId(pollId);
+            var result = await _questionService.GetListByPollId(pollId, fillters);
             if(result.Status == 200)
                 return Ok(result);
             return NotFound(result);

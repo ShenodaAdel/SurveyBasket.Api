@@ -1,5 +1,6 @@
 ﻿
 
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Question.Dtos;
 
 namespace SurveyBasket.Application.RepositoriesInterfaces
@@ -13,7 +14,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<Question?> GetByIdAsync(int id);
         Task<Question?> GetByPollIdAndIdAsync(int pollId, int id);
         Task<QuestionResponse?> GetByPollIdAsync(int pollId, int id);
-        Task<ApiResponseData<QuestionResponse>> GetListByPollIdAsync(int pollId);
+        IQueryable<QuestionResponse> GetListByPollId(int pollId, RequestFillters fillters);
         void Update(Question question);
     }
 }

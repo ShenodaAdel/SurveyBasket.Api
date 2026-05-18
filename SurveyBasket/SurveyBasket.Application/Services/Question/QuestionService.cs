@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
+using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Caching;
 using SurveyBasket.Application.Services.Question.Dtos;
 using SurveyBasket.Domain.Entities;
@@ -130,7 +131,7 @@ namespace SurveyBasket.Application.Services.Question
 
         }
 
-        public async Task<ApiResponse<object?>> GetListByPollId( int pollId )
+        public async Task<ApiResponse<object?>> GetListByPollId(int pollId, RequestFillters fillters, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -144,9 +145,10 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var questions = await _unitOfWork.QuestionRepository.GetListByPollIdAsync(pollId);
+            var query = _unitOfWork.QuestionRepository.GetListByPollId(pollId, fillters);
+            var questions = await PaginatedList<QuestionResponse>.CreateAsync(query, fillters.PageNumber, fillters.PageSize, cancellationToken);
 
-            if( questions.Total == 0 )
+            if (questions.TotalCount == 0)
             {
                 messages.Add(new ApiResponseMessage("error", "No Questions found."));
                 return new ApiResponse<object?>(
@@ -161,11 +163,11 @@ namespace SurveyBasket.Application.Services.Question
                 messages: messages);
         }
 
-        public async Task<ApiResponse<object?>> GetAvailableListByPollId( int pollId , string userId )
+        public async Task<ApiResponse<object?>> GetAvailableListByPollId(int pollId, string userId, RequestFillters fillters, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
-            var hasVote = await _unitOfWork.VoteRepository.CheckUserVoted(userId,pollId);
+            var hasVote = await _unitOfWork.VoteRepository.CheckUserVoted(userId, pollId);
 
             if (hasVote)
             {
@@ -185,9 +187,9 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var cacheKey = $"AvailableQuestions_Poll_{pollId}";
+            var cacheKey = $"AvailableQuestions_Poll_{pollId}_Page_{fillters.PageNumber}_Size_{fillters.PageSize}";
 
-            var cachedQuestions = await _cacheService.GetAsync<ApiResponseData<QuestionResponse>>(cacheKey);
+            var cachedQuestions = await _cacheService.GetAsync<PaginatedList<QuestionResponse>>(cacheKey);
             if (cachedQuestions != null)
             {
                 _logger.LogInformation("Cache hit for key: {CacheKey}. Returning questions from cache.", cacheKey);
@@ -198,16 +200,19 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
             _logger.LogInformation("Cache miss for key: {CacheKey}. Fetching questions from database.", cacheKey);
-            var questions = await _unitOfWork.QuestionRepository.GetListByPollIdAsync(pollId);
-            await _cacheService.SetAsync(cacheKey, questions);
 
-            if (questions.Total == 0)
+            var query = _unitOfWork.QuestionRepository.GetListByPollId(pollId,fillters);
+            var questions = await PaginatedList<QuestionResponse>.CreateAsync(query, fillters.PageNumber, fillters.PageSize, cancellationToken);
+
+            if (questions.TotalCount == 0)
             {
                 messages.Add(new ApiResponseMessage("error", "No Questions found."));
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status404NotFound,
                     messages: messages);
             }
+
+            await _cacheService.SetAsync(cacheKey, questions);
 
             messages.Add(new ApiResponseMessage("success", "Questions fetched successfully."));
             return new ApiResponse<object?>(
