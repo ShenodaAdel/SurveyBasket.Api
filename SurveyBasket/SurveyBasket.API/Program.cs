@@ -1,12 +1,16 @@
 using Hangfire;
 using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using SurveyBasket.API.Health;
 using SurveyBasket.API.Middleware;
 using SurveyBasket.Application.Responses;
 using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
+using SurveyBasket.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +63,14 @@ builder.Services.AddHangfire(configuration => configuration
 builder.Services.AddHangfireServer();
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>()
+    .AddHangfire(options =>
+    {
+        options.MinimumAvailableServers = 1;
+    })
+    .AddCheck<MailProviderHealthCheck>("Mail Provider");
 
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -117,4 +129,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 //app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.MapHealthChecks("health",new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.Run();

@@ -1,24 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Caching;
 using SurveyBasket.Application.Services.Question.Dtos;
-using SurveyBasket.Domain.Entities;
 
 
 namespace SurveyBasket.Application.Services.Question
 {
     public class QuestionService(IUnitOfWork unitOfWork , ICacheService cacheService
-        , IValidator<QuestionRequest> validator
-        , ILogger<QuestionService> logger
-        , TypeAdapterConfig config) 
+        , ILogger<QuestionService> logger ) 
         : IQuestionService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IValidator<QuestionRequest> _validator = validator;
         private readonly ILogger<QuestionService> _logger = logger;
         private readonly ICacheService _cacheService = cacheService;
-        private readonly TypeAdapterConfig _config = config;
 
         public async Task<ApiResponse<object?>> CreateAsync(int pollId , QuestionRequest request , CancellationToken cancellationToken = default)
         {
@@ -33,22 +27,6 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var validationResult = await _validator.ValidateAsync(request);
-
-            if (!validationResult.IsValid)
-            {
-                var errorMessages = validationResult.Errors
-                    .Select(e => new ApiResponseMessage("Bad Request", e.ErrorMessage))
-                    .ToList();
-
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: errorMessages,
-                    data: null
-                );
-            }
-
-
             var questionIsExist = await _unitOfWork.QuestionRepository.CheckIsExistAsync(request.Content, pollId);
             if (questionIsExist)
             {
@@ -59,7 +37,7 @@ namespace SurveyBasket.Application.Services.Question
             }
 
 
-            var question = request.Adapt<Domain.Entities.Question>(_config);
+            var question = request.Adapt<Domain.Entities.Question>();
             question.PollId = pollId;
 
 
