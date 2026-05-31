@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Application.Helpers;
@@ -5,7 +6,9 @@ using SurveyBasket.Application.Services.Auth.Filter;
 
 namespace SurveyBasket.API.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1")]
+    [ApiVersion("2")] 
+    [Route("api/V{version:apiVersion}/[controller]")]
     [ApiController]
     public class PollsController(IPollService pollService) : ControllerBase
     {
@@ -22,12 +25,26 @@ namespace SurveyBasket.API.Controllers
             return NotFound(polls);
         }
 
+        [MapToApiVersion("1")]
         [HttpGet("GetCurrentList")]
         [Authorize(Roles = DefaultRoles.User)]
         [EnableRateLimiting("userLimit")]
         public async Task<IActionResult> GetCurrentList()
         {
             var polls = await _pollService.GetCurrentList();
+
+            if (polls.Status == StatusCodes.Status200OK)
+                return Ok(polls);
+            return NotFound(polls);
+        }
+
+        [MapToApiVersion("2")]
+        [HttpGet("GetCurrentList")]
+        [Authorize(Roles = DefaultRoles.User)]
+        [EnableRateLimiting("userLimit")]
+        public async Task<IActionResult> GetCurrentListV2()
+        {
+            var polls = await _pollService.GetCurrentListV2();
 
             if (polls.Status == StatusCodes.Status200OK)
                 return Ok(polls);

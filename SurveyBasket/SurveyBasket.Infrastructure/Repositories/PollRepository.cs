@@ -38,6 +38,18 @@ namespace SurveyBasket.Infrastructure.Repositories
 
             return new ApiResponseData<PollResponse>(await query.ToListAsync(), totalRecords);
         }
+        public async Task<ApiResponseData<PollResponseV2>> GetCurrenrtListV2Async()
+        {
+            var query = _context.Polls
+                .Where(p => p.IsPublished && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && p.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .AsNoTracking()
+                .ProjectToType<PollResponseV2>()
+                .AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            return new ApiResponseData<PollResponseV2>(await query.ToListAsync(), totalRecords);
+        }
 
         public async Task AddAsync(Poll poll)
         {

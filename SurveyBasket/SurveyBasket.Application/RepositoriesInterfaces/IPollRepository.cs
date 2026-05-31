@@ -13,6 +13,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<bool> CheckTitleAsync(string title);
         Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id);
         Task<ApiResponseData<PollResponse>> GetCurrenrtListAsync();
+        Task<ApiResponseData<PollResponseV2>> GetCurrenrtListV2Async();
         Task<bool> CheckIsActiveAsync(int id);
         Task<PollVoteResponse?> GetPollVoteResponseAsync(int pollId, CancellationToken cancellationToken = default);
         Task<List<Poll>> GetAllIsPublished();

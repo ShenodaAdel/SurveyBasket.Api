@@ -85,6 +85,26 @@ namespace SurveyBasket.Application.Services.PollService
                 status: StatusCodes.Status200OK,
                 messages: messages);
         }
+        public async Task<ApiResponse<object?>> GetCurrentListV2()
+        {
+            var messages = new List<ApiResponseMessage>();
+
+            var polls = await _unitOfWork.PollRepository.GetCurrenrtListV2Async();
+
+            if (polls == null)
+            {
+                messages.Add(new ApiResponseMessage("error", "No Poll found."));
+                return new ApiResponse<object?>(
+                    status: StatusCodes.Status404NotFound,
+                    messages: messages);
+            }
+
+            messages.Add(new ApiResponseMessage("success", "Active Polls fetched successfully."));
+            return new ApiResponse<object?>(
+                data: polls,
+                status: StatusCodes.Status200OK,
+                messages: messages);
+        }
 
         public async Task<ApiResponse<object?>> CreateAsync(PollRequest request)
         {

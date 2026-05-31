@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Hangfire;
 using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
@@ -123,6 +124,24 @@ builder.Services.AddRateLimiter(rateLimiteroptions =>
     //    options.QueueLimit = 1; // maximum number of requests that can be queued
     //    options.SegmentsPerWindow = 3; // number of segments in the sliding window
     //});
+});
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.AssumeDefaultVersionWhenUnspecified = true; 
+    options.ReportApiVersions = true;
+
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+    //options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+    //options.ApiVersionReader = new QueryStringApiVersionReader("api-version");
+    //options.ApiVersionReader = new MediaTypeApiVersionReader("x-api-version");
+
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true; 
+
 });
 
 
