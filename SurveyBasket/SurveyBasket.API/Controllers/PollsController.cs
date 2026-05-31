@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Filter;
 
@@ -23,6 +24,7 @@ namespace SurveyBasket.API.Controllers
 
         [HttpGet("GetCurrentList")]
         [Authorize(Roles = DefaultRoles.User)]
+        [EnableRateLimiting("userLimit")]
         public async Task<IActionResult> GetCurrentList()
         {
             var polls = await _pollService.GetCurrentList();

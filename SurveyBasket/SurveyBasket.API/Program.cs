@@ -3,14 +3,17 @@ using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using SurveyBasket.API.Extensions;
 using SurveyBasket.API.Health;
 using SurveyBasket.API.Middleware;
 using SurveyBasket.Application.Responses;
 using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
 using SurveyBasket.Infrastructure.Persistence;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +61,70 @@ builder.Services.AddHangfire(configuration => configuration
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+builder.Services.AddRateLimiter(rateLimiteroptions =>
+{
+    rateLimiteroptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    rateLimiteroptions.AddPolicy("ipLimit", HttpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: HttpContext.Connection.RemoteIpAddress?.ToString(),
+        factory : _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 2,
+            Window = TimeSpan.FromSeconds(10)
+        }
+    ));
+
+    rateLimiteroptions.AddPolicy("userLimit", HttpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: HttpContext.User.GetUserId(),
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 2,
+            Window = TimeSpan.FromSeconds(10)
+        }
+    ));
+
+
+    rateLimiteroptions.AddConcurrencyLimiter("ConcurrencyLimiter", options =>
+    {
+        options.PermitLimit = 1000; // can you take 10 requests at the same time
+        options.QueueLimit = 100;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // FIFO queue
+        // if more than 10 requests come at the same time, they will be queued.
+        // This is the maximum number of requests that can be queued. If the queue is full,
+        // the request will be rejected with a 429 Too Many Requests response.
+    });
+
+    //rateLimiteroptions.AddTokenBucketLimiter("TokenBucketLimiter", options =>
+    //{
+    //    options.TokenLimit = 10; // maximum number of tokens in the bucket
+    //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // FIFO queue
+    //    options.QueueLimit = 1; // maximum number of requests that can be queued
+    //    options.ReplenishmentPeriod = TimeSpan.FromSeconds(30); // time to replenish the bucket
+    //    options.TokensPerPeriod = 2; // number of tokens to add to the bucket each replenishment period)
+    //    options.AutoReplenishment = true; // automatically replenish the bucket
+    //});
+
+    //rateLimiteroptions.AddFixedWindowLimiter("FixedWindowLimiter", options =>
+    //{
+    //    options.Window = TimeSpan.FromSeconds(30); // time window for the fixed window limiter 
+    //    options.PermitLimit = 10; // maximum number of requests allowed in the time window
+    //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // FIFO queue
+    //    options.QueueLimit = 1; // maximum number of requests that can be queued
+    //});
+
+    //rateLimiteroptions.AddSlidingWindowLimiter("SlidingWindowLimiter", options =>
+    //{
+    //    options.Window = TimeSpan.FromSeconds(30); // time window for the sliding window limiter
+    //    options.PermitLimit = 10; // maximum number of requests allowed in the time window
+    //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // FIFO queue
+    //    options.QueueLimit = 1; // maximum number of requests that can be queued
+    //    options.SegmentsPerWindow = 3; // number of segments in the sliding window
+    //});
+});
+
 
 // Add the processing server as IHostedService
 builder.Services.AddHangfireServer();
@@ -124,6 +191,9 @@ RecurringJob.AddOrUpdate("SendNewPollsNotification", () => notificationService.S
 app.UseCors();
 
 app.UseExceptionHandler();
+
+app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

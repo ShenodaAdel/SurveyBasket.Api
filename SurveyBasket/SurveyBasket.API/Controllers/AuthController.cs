@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Application.Services.Auth;
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
@@ -6,6 +7,7 @@ namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("ipLimit")]
     public class AuthController(IAuthService authService, IJWTProvider jWTProvider) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
@@ -27,6 +29,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpPost("register")]
+        [DisableRateLimiting]
         public async Task<IActionResult> RegisterAsync(RegisterRequest request)
         {
             var response = await _authService.RegisterAsync(request);
@@ -74,7 +77,15 @@ namespace SurveyBasket.API.Controllers
         {
             var response = await _jWTProvider.RevokeRefreshTokenAsync(request, cancellationToken);
             return StatusCode(response.Status, response);
-        }   
+        }
+
+        [HttpGet("test")]
+        [EnableRateLimiting("ConcurrencyLimiter")]
+        public async Task<IActionResult> TestAsync()
+        {
+            Thread.Sleep(5000);
+            return Ok("Test successful!");
+        }
     }
 
 }
