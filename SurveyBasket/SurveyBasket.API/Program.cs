@@ -10,6 +10,7 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.API.Extensions;
 using SurveyBasket.API.Health;
 using SurveyBasket.API.Middleware;
+using SurveyBasket.API.Swagger;
 using SurveyBasket.Application.Responses;
 using SurveyBasket.Application.Services.Email;
 using SurveyBasket.Application.Services.Notification;
@@ -63,6 +64,7 @@ builder.Services.AddHangfire(configuration => configuration
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
 
+// RateLimiting configuration
 builder.Services.AddRateLimiter(rateLimiteroptions =>
 {
     rateLimiteroptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -125,6 +127,8 @@ builder.Services.AddRateLimiter(rateLimiteroptions =>
     //    options.SegmentsPerWindow = 3; // number of segments in the sliding window
     //});
 });
+
+// Api Versioning configuration
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1);
@@ -172,6 +176,7 @@ builder.Host.UseSerilog((context, configuration) =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 
 var app = builder.Build();
@@ -180,7 +185,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        var descriptions = app.DescribeApiVersions();
+
+        foreach (var description in descriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 app.UseSerilogRequestLogging();
