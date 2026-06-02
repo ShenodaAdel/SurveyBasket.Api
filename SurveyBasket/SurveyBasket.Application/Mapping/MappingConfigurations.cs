@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SurveyBasket.Application.Services.Question.Dtos;
+﻿using SurveyBasket.Application.Services.Question.Dtos;
 using SurveyBasket.Application.Services.Users.Dtos;
 
 namespace SurveyBasket.Application.Mapping

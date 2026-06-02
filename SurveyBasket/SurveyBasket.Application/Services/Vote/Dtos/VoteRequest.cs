@@ -1,4 +1,4 @@
 ﻿namespace SurveyBasket.Application.Services.Vote.Dtos
 {
-    public record VoteRequest (IEnumerable<VoteAnswerRequest> Answers); 
+    public record VoteRequest(IEnumerable<VoteAnswerRequest> Answers);
 }

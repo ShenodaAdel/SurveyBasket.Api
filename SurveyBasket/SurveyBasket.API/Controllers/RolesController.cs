@@ -2,7 +2,6 @@
 using SurveyBasket.Application.Services.Auth.Filter;
 using SurveyBasket.Application.Services.Role;
 using SurveyBasket.Application.Services.Role.Dtos;
-using SurveyBasket.Infrastructure.Repositories;
 
 namespace SurveyBasket.API.Controllers
 {
@@ -14,7 +13,7 @@ namespace SurveyBasket.API.Controllers
 
         [HttpGet("GetAll")]
         [HasPermission(Permissions.GetRoles)]
-        public async Task<IActionResult> GetAll([FromQuery] bool? includeDisabled = false)
+        public async Task<IActionResult> GetAll([FromQuery] bool includeDisabled = false)
         {
             var result = await roleService.GetAllAsync(includeDisabled);
             return StatusCode(result.Status, result);
@@ -27,7 +26,7 @@ namespace SurveyBasket.API.Controllers
             var result = await roleService.GetByIdAsync(id);
             return StatusCode(result.Status, result);
         }
-            
+
         [HttpPost("CreateRole")]
         [HasPermission(Permissions.AddRoles)]
         public async Task<IActionResult> CreateAsync([FromBody] RoleRequest request)

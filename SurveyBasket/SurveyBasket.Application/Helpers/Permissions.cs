@@ -4,9 +4,9 @@
     {
         public static string Type { get; } = "permissions";
 
-        public const string GetPolls = "polls:get";    
-        public const string AddPolls = "polls:add";    
-        public const string UpdatePolls = "polls:update";    
+        public const string GetPolls = "polls:get";
+        public const string AddPolls = "polls:add";
+        public const string UpdatePolls = "polls:update";
         public const string DeletePolls = "polls:delete";
 
         public const string GetQuestions = "questions:get";

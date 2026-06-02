@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SurveyBasket.Application.Helpers;
+﻿using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Filter;
 using SurveyBasket.Application.Services.Users;
 using SurveyBasket.Application.Services.Users.Dtos;
@@ -39,9 +37,9 @@ namespace SurveyBasket.API.Controllers
 
         [HttpPut("{id}")]
         [HasPermission(Permissions.UpdateUsers)]
-        public async Task<IActionResult> UpdateUser([FromRoute] string id , [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUser([FromRoute] string id, [FromBody] UpdateUserRequest request)
         {
-            var result = await _userService.UpdateAsync(id,request);
+            var result = await _userService.UpdateAsync(id, request);
             return StatusCode(result.Status, result);
         }
 

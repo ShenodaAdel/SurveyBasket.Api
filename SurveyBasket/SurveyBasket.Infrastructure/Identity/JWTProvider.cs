@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using SurveyBasket.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Application.Services.Auth.Dtos;
@@ -12,9 +11,9 @@ using System.Text.Json;
 
 namespace SurveyBasket.Infrastructure.Identity
 {
-    public class JWTProvider(IOptions<JwtOptions> jwtOptions ,
+    public class JWTProvider(IOptions<JwtOptions> jwtOptions,
         SignInManager<ApplicationUser> signInManager
-        , UserManager<ApplicationUser> userManager,IUnitOfWork unitOfWork) : IJWTProvider
+        , UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork) : IJWTProvider
     {
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -22,7 +21,7 @@ namespace SurveyBasket.Infrastructure.Identity
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly int _refreshTokenExpiryDays = 30;
 
-        public (string token, int expiresIn) GenerateToken(ApplicationUser user , IEnumerable<string>roles , IEnumerable<string> permissions)
+        public (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles, IEnumerable<string> permissions)
         {
             Claim[] claims = [
                 new (JwtRegisteredClaimNames.Sub, user.Id!),
@@ -34,7 +33,7 @@ namespace SurveyBasket.Infrastructure.Identity
 
             // Link web site i used it to catch Secret key by ssh 256 -> https://acte.ltd/utils/randomkeygen?utm_source=chatgpt.com
             // responsable to Encoding and Decoding
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key)); 
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
 
             // Secret Ket + Algorthims 
             var singingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
@@ -43,13 +42,13 @@ namespace SurveyBasket.Infrastructure.Identity
 
             var token = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer, // who create Token 
-                audience : _jwtOptions.Audience,
-                claims : claims,
-                expires : DateTime.UtcNow.AddMinutes(expiresIn),
-                signingCredentials : singingCredentials 
+                audience: _jwtOptions.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiresIn),
+                signingCredentials: singingCredentials
                 ); // Shape of Token 
 
-            return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: expiresIn * 60 );
+            return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: expiresIn * 60);
         }
 
         public string? ValidateToken(string token)
@@ -103,7 +102,7 @@ namespace SurveyBasket.Infrastructure.Identity
             }
 
             var user = await _userManager.FindByIdAsync(userId);
-            
+
             if (user == null)
             {
                 messages.Add(new ApiResponseMessage("error", "User", "User associated with the provided token does not exist."));
@@ -134,7 +133,7 @@ namespace SurveyBasket.Infrastructure.Identity
 
             var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == request.RefreshToken && x.IsActive);
 
-            if(userRefreshToken == null )
+            if (userRefreshToken == null)
             {
                 messages.Add(new ApiResponseMessage("error", "RefreshToken", "The provided refresh token is invalid or has expired."));
                 return new ApiResponse<object?>(
@@ -146,7 +145,7 @@ namespace SurveyBasket.Infrastructure.Identity
             userRefreshToken.RevokedOn = DateTime.UtcNow;
 
             var roles = await _userManager.GetRolesAsync(user);
-            var permissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user,roles);
+            var permissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, roles);
 
             var (newtoken, expiresIn) = GenerateToken(user, roles, permissions);
 

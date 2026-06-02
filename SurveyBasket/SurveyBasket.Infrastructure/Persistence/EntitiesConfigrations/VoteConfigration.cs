@@ -6,6 +6,6 @@
         {
             builder.HasIndex(x => new { x.PollId, x.UserId }).IsUnique(); // USer can make vote greater than one for the same poll 
         }
-    
+
     }
 }

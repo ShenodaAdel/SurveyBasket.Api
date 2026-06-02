@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using SurveyBasket.Domain.Common;
-using SurveyBasket.Domain.Entities;
 using System.Security.Claims;
 
 namespace SurveyBasket.Infrastructure.Persistence
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options , IHttpContextAccessor httpContextAccessor) 
-        : IdentityDbContext<ApplicationUser, ApplicationRole , string>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
+        : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
@@ -26,7 +25,7 @@ namespace SurveyBasket.Infrastructure.Persistence
 
             foreach (var fk in cascadeFKs)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
-            
+
 
             base.OnModelCreating(modelBuilder);
         }
@@ -35,7 +34,7 @@ namespace SurveyBasket.Infrastructure.Persistence
         {
             var entries = ChangeTracker.Entries<BaseEntity>();
 
-            foreach (var entry in entries) 
+            foreach (var entry in entries)
             {
                 var currentUserId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 

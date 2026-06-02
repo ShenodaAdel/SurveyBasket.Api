@@ -6,7 +6,7 @@ namespace SurveyBasket.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<bool> CheckUserVoted(string userId , int pollId)
+        public async Task<bool> CheckUserVoted(string userId, int pollId)
         {
             return await _context.Votes.AnyAsync(v => v.PollId == pollId && v.UserId == userId);
         }

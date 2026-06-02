@@ -10,7 +10,6 @@ namespace SurveyBasket.Application.Services.Question
         Task<ApiResponse<object?>> GetByPollId(int pollId, int id);
         Task<ApiResponse<object?>> GetListByPollId(int pollId, RequestFillters fillters, CancellationToken cancellationToken = default);
         Task<ApiResponse<object?>> ToggleStatusAsync(int pollId, int id);
-        Task<ApiResponse<object?>> UpdateAsync(int pollId, int id , QuestionRequest request);
+        Task<ApiResponse<object?>> UpdateAsync(int pollId, int id, QuestionRequest request);
     }
 }
-    

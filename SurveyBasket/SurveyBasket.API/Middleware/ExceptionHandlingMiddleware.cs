@@ -9,7 +9,7 @@ namespace SurveyBasket.API.Middleware
         private readonly RequestDelegate _next = next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger;
 
-        public async Task InvokeAsync(HttpContext httpContext) 
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace SurveyBasket.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred : {Message}" , ex.Message);
+                _logger.LogError(ex, "An unhandled exception occurred : {Message}", ex.Message);
                 httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 httpContext.Response.ContentType = "application/json";
 

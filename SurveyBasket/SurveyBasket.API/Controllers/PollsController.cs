@@ -7,7 +7,7 @@ using SurveyBasket.Application.Services.Auth.Filter;
 namespace SurveyBasket.API.Controllers
 {
     [ApiVersion("1")]
-    [ApiVersion("2")] 
+    [ApiVersion("2")]
     [Route("api/V{version:apiVersion}/[controller]")]
     [ApiController]
     public class PollsController(IPollService pollService) : ControllerBase
@@ -27,7 +27,7 @@ namespace SurveyBasket.API.Controllers
 
         [MapToApiVersion("1")]
         [HttpGet("GetCurrentList")]
-        [Authorize(Roles = DefaultRoles.User)]
+        [Authorize(Roles = DefaultRoles.User.Name)]
         [EnableRateLimiting("userLimit")]
         public async Task<IActionResult> GetCurrentList()
         {
@@ -40,7 +40,7 @@ namespace SurveyBasket.API.Controllers
 
         [MapToApiVersion("2")]
         [HttpGet("GetCurrentList")]
-        [Authorize(Roles = DefaultRoles.User)]
+        [Authorize(Roles = DefaultRoles.User.Name)]
         [EnableRateLimiting("userLimit")]
         public async Task<IActionResult> GetCurrentListV2()
         {

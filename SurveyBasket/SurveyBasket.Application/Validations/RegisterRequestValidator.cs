@@ -18,7 +18,7 @@ namespace SurveyBasket.Application.Validations
 
             RuleFor(x => x.FirstName)
                .NotEmpty().WithMessage("FirstName is required.")
-               .Length(3,100);
+               .Length(3, 100);
 
             RuleFor(x => x.LastName)
                .NotEmpty().WithMessage("LastName is required.")

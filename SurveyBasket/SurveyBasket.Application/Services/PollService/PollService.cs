@@ -3,12 +3,10 @@ using SurveyBasket.Application.Services.Notification;
 
 namespace SurveyBasket.Application.Services.PollService
 {
-    public class PollService(IUnitOfWork unitOfWork, 
-        IValidator<PollRequest> validator,
+    public class PollService(IUnitOfWork unitOfWork,
         INotificationService notificationService) : IPollService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IValidator<PollRequest> _validator = validator;
         private readonly INotificationService _notificationService = notificationService;
 
         public async Task<ApiResponse<object?>> GetById(int id)
@@ -110,21 +108,6 @@ namespace SurveyBasket.Application.Services.PollService
         {
             var messages = new List<ApiResponseMessage>();
 
-            var validationResult = await _validator.ValidateAsync(request);
-
-            if (!validationResult.IsValid)
-            {
-                var errorMessages = validationResult.Errors
-                    .Select(e => new ApiResponseMessage("Bad Request", e.ErrorMessage))
-                    .ToList();
-
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: errorMessages,
-                    data: null
-                );
-            }
-
             var isTitleExists = await _unitOfWork.PollRepository.CheckTitleAsync(request.Title);
             if (isTitleExists)
             {
@@ -167,7 +150,7 @@ namespace SurveyBasket.Application.Services.PollService
                     messages: messages);
             }
 
-            var isTitleExists = await _unitOfWork.PollRepository.CheckTitleAndNotTheSamePollAsync(request.Title , id);
+            var isTitleExists = await _unitOfWork.PollRepository.CheckTitleAndNotTheSamePollAsync(request.Title, id);
             if (isTitleExists)
             {
                 messages.Add(new ApiResponseMessage("validation", "Title", $"A Poll with the title '{request.Title}' already exists."));
@@ -176,12 +159,8 @@ namespace SurveyBasket.Application.Services.PollService
                     messages: messages);
             }
 
-            poll.Title = request.Title;
-            poll.Summary = request.Summary;
-            poll.StartsAt = request.StartsAt;
-            poll.EndsAt = request.EndsAt;
+            poll = request.Adapt(poll);
 
-            _unitOfWork.PollRepository.Update(poll);
             await _unitOfWork.SaveChangesAsync();
 
             messages.Add(new ApiResponseMessage("success", "Poll Updated successfully."));
@@ -244,10 +223,9 @@ namespace SurveyBasket.Application.Services.PollService
             }
 
             poll.IsPublished = !poll.IsPublished;
-            _unitOfWork.PollRepository.Update(poll);
             await _unitOfWork.SaveChangesAsync();
 
-            if(poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+            if (poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
                 BackgroundJob.Enqueue(() => _notificationService.SendNewPollsNotification(poll.Id));
 
             messages.Add(new ApiResponseMessage("success", "Poll publish status updated successfully."));

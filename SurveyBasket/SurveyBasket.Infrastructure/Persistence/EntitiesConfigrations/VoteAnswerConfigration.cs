@@ -7,6 +7,6 @@
             builder.HasIndex(x => new { x.VoteId, x.QuestionId }).IsUnique(); // the one question must choose once 
 
         }
-    
+
     }
 }

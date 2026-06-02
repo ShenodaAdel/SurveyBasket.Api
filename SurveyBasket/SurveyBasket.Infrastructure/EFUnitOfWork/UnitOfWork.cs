@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SurveyBasket.Domain.Entities;
-
-namespace SurveyBasket.Infrastructure.EFUnitOfWork
+﻿namespace SurveyBasket.Infrastructure.EFUnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {

@@ -36,13 +36,13 @@ namespace SurveyBasket.Application.DependencyInjection
             //
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IPollService, PollService>();
-            services.AddScoped<IAuthService,AuthService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IQuestionService, QuestionService>();
             services.AddScoped<IVoteService, VoteService>();
             services.AddScoped<IResultService, ResultService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IUserService , UserService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
 
             return services;

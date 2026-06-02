@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SurveyBasket.Application.Helpers;
+﻿using SurveyBasket.Application.Helpers;
 
 namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
 {
@@ -10,8 +9,8 @@ namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
             builder.HasData(
                 new IdentityUserRole<string>
                 {
-                    UserId = DefaultUsers.AdminId,
-                    RoleId = DefaultRoles.AdminRoleId,
+                    UserId = DefaultUsers.Admin.Id,
+                    RoleId = DefaultRoles.Admin.Id,
                 }
             );
         }

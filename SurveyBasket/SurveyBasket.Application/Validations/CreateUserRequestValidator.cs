@@ -13,7 +13,7 @@ namespace SurveyBasket.Application.Validations
 
             RuleFor(u => u.FirstName)
                 .NotEmpty()
-                .Length(3,100);
+                .Length(3, 100);
 
             RuleFor(u => u.LastName)
                 .NotEmpty()
@@ -29,7 +29,7 @@ namespace SurveyBasket.Application.Validations
                 .NotEmpty();
 
             RuleFor(u => u.Roles)
-                .Must(u  => u.Distinct().Count() == u.Count)
+                .Must(u => u.Distinct().Count() == u.Count)
                 .WithMessage("Roles must be unique.")
                 .When(u => u.Roles != null);
         }

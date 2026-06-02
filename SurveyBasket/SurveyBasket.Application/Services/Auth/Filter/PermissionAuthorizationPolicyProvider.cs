@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace SurveyBasket.Application.Services.Auth.Filter
 {
-    public class PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) 
+    public class PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
         : DefaultAuthorizationPolicyProvider(options)
     {
         private readonly AuthorizationOptions _authorizationOptions = options.Value;
@@ -13,12 +13,12 @@ namespace SurveyBasket.Application.Services.Auth.Filter
 
             if (policy != null)
                 return policy;
-            
+
 
             var permissionPolicy = new AuthorizationPolicyBuilder()
             .AddRequirements(new PermissionRequirement(policyName))
                 .Build();
-            
+
             _authorizationOptions.AddPolicy(policyName, permissionPolicy);
             return permissionPolicy;
         }

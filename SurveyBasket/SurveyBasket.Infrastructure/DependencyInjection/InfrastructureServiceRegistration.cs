@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Application.Services.Auth.JWT;
-using SurveyBasket.Domain.Entities;
 using SurveyBasket.Infrastructure.Identity;
 using System.Text;
 
@@ -11,9 +8,9 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
 {
     public static class InfrastructureServiceRegistration
     {
-        
 
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
+
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpContextAccessor();
 
@@ -51,7 +48,7 @@ namespace SurveyBasket.Infrastructure.DependencyInjection
                     ValidateIssuerSigningKey = true,
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true,    
+                    ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
                     ValidIssuer = jwtSettings?.Issuer,
                     ValidAudience = jwtSettings?.Audience

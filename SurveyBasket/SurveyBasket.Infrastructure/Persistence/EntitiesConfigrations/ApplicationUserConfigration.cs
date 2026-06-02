@@ -1,5 +1,4 @@
 ﻿using SurveyBasket.Application.Helpers;
-using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
 {
@@ -21,17 +20,17 @@ namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
             builder.HasData(
                 new ApplicationUser
                 {
-                    Id = DefaultUsers.AdminId,
+                    Id = DefaultUsers.Admin.Id,
                     FirstName = "Survey Basket",
                     LastName = "Admin",
-                    UserName = DefaultUsers.AdminEmail,
-                    NormalizedUserName = DefaultUsers.AdminEmail.ToUpper(),
-                    Email = DefaultUsers.AdminEmail,
-                    NormalizedEmail = DefaultUsers.AdminEmail.ToUpper(),
-                    SecurityStamp = DefaultUsers.AdminSecuirtyStamp,
-                    ConcurrencyStamp = DefaultUsers.AdminConcurrencyStamp,
+                    UserName = DefaultUsers.Admin.Email,
+                    NormalizedUserName = DefaultUsers.Admin.Email.ToUpper(),
+                    Email = DefaultUsers.Admin.Email,
+                    NormalizedEmail = DefaultUsers.Admin.Email.ToUpper(),
+                    SecurityStamp = DefaultUsers.Admin.SecuirtyStamp,
+                    ConcurrencyStamp = DefaultUsers.Admin.ConcurrencyStamp,
                     EmailConfirmed = true,
-                    PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
+                    PasswordHash = DefaultUsers.Admin.PasswordHash
                 });
         }
 

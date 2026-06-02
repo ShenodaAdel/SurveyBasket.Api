@@ -1,5 +1,4 @@
-﻿using SurveyBasket.Application.Helpers;
-using SurveyBasket.Application.Services.Users.Dtos;
+﻿using SurveyBasket.Application.Services.Users.Dtos;
 
 namespace SurveyBasket.Application.Validations
 {

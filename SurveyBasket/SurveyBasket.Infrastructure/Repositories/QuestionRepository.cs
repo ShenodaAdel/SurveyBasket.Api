@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using SurveyBasket.Application.Helpers;
-using SurveyBasket.Application.Services.Answer.Dros;
 using SurveyBasket.Application.Services.Question.Dtos;
 using System.Linq.Dynamic.Core;
 
@@ -14,12 +13,12 @@ namespace SurveyBasket.Infrastructure.Repositories
         {
             return await _context.Questions.FirstOrDefaultAsync(q => q.Id == id);
         }
-        public async Task<QuestionResponse?> GetByPollIdAsync( int pollId , int id )
+        public async Task<QuestionResponse?> GetByPollIdAsync(int pollId, int id)
         {
-           return await _context.Questions.Where(q => q.PollId == pollId && q.Id == id)
-                .AsNoTracking()
-                .ProjectToType<QuestionResponse>()
-                .SingleOrDefaultAsync();
+            return await _context.Questions.Where(q => q.PollId == pollId && q.Id == id)
+                 .AsNoTracking()
+                 .ProjectToType<QuestionResponse>()
+                 .SingleOrDefaultAsync();
 
         }
         public async Task<Question?> GetByPollIdAndIdAsync(int pollId, int id)
@@ -30,16 +29,16 @@ namespace SurveyBasket.Infrastructure.Repositories
                  .SingleOrDefaultAsync();
 
         }
-        public async Task<bool> CheckIsExistAsync(string content , int pollId)
+        public async Task<bool> CheckIsExistAsync(string content, int pollId)
         {
             return await _context.Questions.AnyAsync(q => q.Content == content && q.PollId == pollId);
         }
-        public async Task<bool> CheckIsExistWithSameContentBYPollIdAsync(string content, int pollId  , int id )
+        public async Task<bool> CheckIsExistWithSameContentBYPollIdAsync(string content, int pollId, int id)
         {
             return await _context.Questions.AnyAsync(
-                q => q.PollId == pollId  
+                q => q.PollId == pollId
                 && q.Id != id
-                && q.Content == content );
+                && q.Content == content);
         }
         public async Task<List<int>> GetActiveQuestionIds(int pollId)
         {

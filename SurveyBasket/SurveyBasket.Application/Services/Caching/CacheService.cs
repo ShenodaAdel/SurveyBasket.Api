@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SurveyBasket.Application.Services.Caching
 {
@@ -22,7 +17,7 @@ namespace SurveyBasket.Application.Services.Caching
             var json = JsonSerializer.Serialize(value);
             await _distributedCache.SetStringAsync(key, json);
         }
-        public async Task RemoveAsync(string key) 
+        public async Task RemoveAsync(string key)
         {
             await _distributedCache.RemoveAsync(key);
         }

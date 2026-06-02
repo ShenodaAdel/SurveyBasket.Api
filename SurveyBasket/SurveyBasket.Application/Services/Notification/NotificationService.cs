@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Email;
 
@@ -28,9 +27,7 @@ namespace SurveyBasket.Application.Services.Notification
                 polls = await _unitOfWork.PollRepository.GetAllIsPublished();
             }
 
-            // TODO : Select only users to send notification
-
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.GetUsersInRoleAsync(DefaultRoles.User.Name);
             var origin = _httpContextAccessor.HttpContext?.Request.Headers["Origin"].ToString();
             foreach (var poll in polls)
             {

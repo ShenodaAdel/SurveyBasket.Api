@@ -3,7 +3,7 @@ using SurveyBasket.Application.Responses;
 
 namespace SurveyBasket.API.Middleware
 {
-    public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler>logger) : IExceptionHandler
+    public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
     {
         private readonly ILogger<GlobalExceptionHandler> _logger = logger;
 
@@ -23,7 +23,7 @@ namespace SurveyBasket.API.Middleware
                 messages
             );
 
-            await httpContext.Response.WriteAsJsonAsync(apiResponse , cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(apiResponse, cancellationToken);
             return true;
         }
     }

@@ -11,7 +11,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         void Update(Poll poll);
         void Delete(Poll poll);
         Task<bool> CheckTitleAsync(string title);
-        Task<bool> CheckTitleAndNotTheSamePollAsync(string title , int id);
+        Task<bool> CheckTitleAndNotTheSamePollAsync(string title, int id);
         Task<ApiResponseData<PollResponse>> GetCurrenrtListAsync();
         Task<ApiResponseData<PollResponseV2>> GetCurrenrtListV2Async();
         Task<bool> CheckIsActiveAsync(int id);

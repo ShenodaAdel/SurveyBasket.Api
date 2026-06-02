@@ -10,33 +10,33 @@ namespace SurveyBasket.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = DefaultRoles.User)]
+    [Authorize(Roles = DefaultRoles.User.Name)]
     [EnableRateLimiting("concurrency")]
-    public class VoteController(IQuestionService questionService , IVoteService voteService) : ControllerBase
+    public class VoteController(IQuestionService questionService, IVoteService voteService) : ControllerBase
     {
         private readonly IQuestionService _questionService = questionService;
         private readonly IVoteService _voteService = voteService;
 
         [HttpGet("GetListAvaibale/{pollid}")]
-        public async Task<IActionResult> GetAvaibalePoll([FromRoute]int pollId,[FromQuery] RequestFillters fillters)
+        public async Task<IActionResult> GetAvaibalePoll([FromRoute] int pollId, [FromQuery] RequestFillters fillters)
         {
             var userId = User.GetUserId();
-            var result = await _questionService.GetAvailableListByPollId(pollId, userId!,fillters);
+            var result = await _questionService.GetAvailableListByPollId(pollId, userId!, fillters);
 
-            if(result.Status == 200) return Ok(result);
+            if (result.Status == 200) return Ok(result);
             else if (result.Status == 404) return NotFound(result);
             return BadRequest(result);
 
         }
         [HttpPost("{pollId}")]
-        public async Task<IActionResult> Create([FromRoute] int pollId , VoteRequest request)
+        public async Task<IActionResult> Create([FromRoute] int pollId, VoteRequest request)
         {
             var userId = User.GetUserId();
-            var result = await _voteService.CreateAsync(pollId, userId!,request);
-            if( result.Status == 201) return CreatedAtAction(nameof(Create), result);
-            else if ( result.Status == 404) return NotFound(result);
-                return BadRequest(result);
-            
+            var result = await _voteService.CreateAsync(pollId, userId!, request);
+            if (result.Status == 201) return CreatedAtAction(nameof(Create), result);
+            else if (result.Status == 404) return NotFound(result);
+            return BadRequest(result);
+
         }
     }
 }

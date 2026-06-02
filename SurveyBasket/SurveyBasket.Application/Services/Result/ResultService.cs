@@ -1,12 +1,10 @@
-﻿using SurveyBasket.Application.Services.Result.Dtos;
-
-namespace SurveyBasket.Application.Services.Result
+﻿namespace SurveyBasket.Application.Services.Result
 {
     public class ResultService(IUnitOfWork unitOfWork) : IResultService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<ApiResponse<object?>> GetPollVotesAsync(int pollId , CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> GetPollVotesAsync(int pollId, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -18,11 +16,11 @@ namespace SurveyBasket.Application.Services.Result
                     messages: messages);
             }
 
-            var poll = await _unitOfWork.PollRepository.GetPollVoteResponseAsync(pollId,cancellationToken);
+            var poll = await _unitOfWork.PollRepository.GetPollVoteResponseAsync(pollId, cancellationToken);
 
-            if(poll == null)
+            if (poll == null)
             {
-                messages.Add(new ApiResponseMessage("error", $"No Poll found with id : {pollId}.")); 
+                messages.Add(new ApiResponseMessage("error", $"No Poll found with id : {pollId}."));
                 return new ApiResponse<object?>(
                 status: StatusCodes.Status404NotFound, messages: messages);
             }
@@ -33,7 +31,7 @@ namespace SurveyBasket.Application.Services.Result
                 status: StatusCodes.Status200OK,
                 messages: messages);
         }
-        public async Task<ApiResponse<object?>> GetVotesPerDayAsync(int pollId , CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> GetVotesPerDayAsync(int pollId, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -45,9 +43,9 @@ namespace SurveyBasket.Application.Services.Result
                     messages: messages);
             }
 
-            var votes = await _unitOfWork.VoteRepository.GetVotesPerDayAsync (pollId, cancellationToken);
+            var votes = await _unitOfWork.VoteRepository.GetVotesPerDayAsync(pollId, cancellationToken);
 
-            if(!votes.Any())
+            if (!votes.Any())
             {
                 messages.Add(new ApiResponseMessage("error", $"No votes found for poll with id : {pollId}."));
                 return new ApiResponse<object?>(
@@ -60,7 +58,7 @@ namespace SurveyBasket.Application.Services.Result
                 status: StatusCodes.Status200OK,
                 messages: messages);
         }
-        public async Task<ApiResponse<object?>> GetVotesPerQuestionAsync(int pollId, CancellationToken cancellationToken =default)
+        public async Task<ApiResponse<object?>> GetVotesPerQuestionAsync(int pollId, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 

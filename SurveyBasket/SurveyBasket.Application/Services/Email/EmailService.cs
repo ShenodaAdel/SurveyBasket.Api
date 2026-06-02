@@ -4,7 +4,7 @@ using MimeKit;
 
 namespace SurveyBasket.Application.Services.Email
 {
-    public class EmailService(IOptions<MailSettings> mailSettings , ILogger<EmailService> logger) : IEmailService
+    public class EmailService(IOptions<MailSettings> mailSettings, ILogger<EmailService> logger) : IEmailService
     {
         private readonly MailSettings _mailSettings = mailSettings.Value;
         private readonly ILogger<EmailService> _logger = logger;
@@ -18,7 +18,7 @@ namespace SurveyBasket.Application.Services.Email
 
             };
             message.To.Add(MailboxAddress.Parse(email));
-            
+
             var builder = new BodyBuilder { HtmlBody = htmlMessage };
 
             message.Body = builder.ToMessageBody();

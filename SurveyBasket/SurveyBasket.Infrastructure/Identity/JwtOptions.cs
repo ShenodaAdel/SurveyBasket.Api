@@ -12,6 +12,6 @@ namespace SurveyBasket.Infrastructure.Identity
         [Required]
         public string Audience { get; init; } = string.Empty;
         [Range(1, int.MaxValue)]
-        public int ExpiryMinutes { get; init; } 
+        public int ExpiryMinutes { get; init; }
     }
 }

@@ -5,17 +5,17 @@ using SurveyBasket.Application.Services.Role.Dtos;
 
 namespace SurveyBasket.Application.Services.Role
 {
-    public class RoleService(RoleManager<ApplicationRole> roleManager , IUnitOfWork unitOfWork ) : IRoleService
+    public class RoleService(RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork) : IRoleService
     {
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<ApiResponse<object?>> GetAllAsync(bool? includeDisabled = false)
+        public async Task<ApiResponse<object?>> GetAllAsync(bool includeDisabled = false)
         {
             var messages = new List<ApiResponseMessage>();
 
             var roles = await _roleManager.Roles
-                 .Where(r => !r.IsDefault && (!r.IsDeleted || (includeDisabled.HasValue && includeDisabled.Value)))
+                 .Where(r => !r.IsDefault && (!r.IsDeleted || includeDisabled))
                  .ProjectToType<RoleResponse>()
                  .ToListAsync();
 
@@ -66,11 +66,11 @@ namespace SurveyBasket.Application.Services.Role
                     status: StatusCodes.Status409Conflict,
                     data: null,
                     messages: messages);
-            }   
+            }
 
             var allowedPermissions = Permissions.GetAllPermissions();
 
-            if(request.Permissions.Except(allowedPermissions).Any())
+            if (request.Permissions.Except(allowedPermissions).Any())
             {
                 messages.Add(new ApiResponseMessage("Bad Request", "One or more permissions are invalid."));
                 return new ApiResponse<object?>(
@@ -82,7 +82,7 @@ namespace SurveyBasket.Application.Services.Role
             var role = new ApplicationRole
             {
                 Name = request.Name,
-                ConcurrencyStamp= Guid.NewGuid().ToString(),
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
             };
 
             var result = await _roleManager.CreateAsync(role);
@@ -101,7 +101,7 @@ namespace SurveyBasket.Application.Services.Role
                 ClaimValue = p,
                 RoleId = role.Id
             });
-            
+
             await _unitOfWork.RoleRepository.AddRangeAsync(permissions);
             await _unitOfWork.SaveChangesAsync();
 
@@ -112,11 +112,11 @@ namespace SurveyBasket.Application.Services.Role
                 messages: messages);
 
         }
-        public async Task<ApiResponse<object?>> UpdateAsync(string id , RoleRequest request)
+        public async Task<ApiResponse<object?>> UpdateAsync(string id, RoleRequest request)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if(await _roleManager.FindByIdAsync(id) is not { } role)
+            if (await _roleManager.FindByIdAsync(id) is not { } role)
             {
                 messages.Add(new ApiResponseMessage("Not Found", "Role not found."));
                 return new ApiResponse<object?>(

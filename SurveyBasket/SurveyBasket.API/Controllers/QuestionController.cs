@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SurveyBasket.Application.Helpers;
+﻿using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Filter;
 using SurveyBasket.Application.Services.Question;
 using SurveyBasket.Application.Services.Question.Dtos;
@@ -15,11 +12,11 @@ namespace SurveyBasket.API.Controllers
         private readonly IQuestionService _questionService = questionService;
         [HttpPost]
         [HasPermission(Permissions.AddQuestions)]
-        public async Task<IActionResult> CreateAsync( int pollId, [FromBody] QuestionRequest request, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateAsync(int pollId, [FromBody] QuestionRequest request, CancellationToken cancellationToken = default)
         {
             var result = await _questionService.CreateAsync(pollId, request, cancellationToken);
             if (result.Status == 201)
-                return Created(nameof(CreateAsync),result);
+                return Created(nameof(CreateAsync), result);
             else if (result.Status == 404)
                 return NotFound(result);
             return BadRequest(result);
@@ -27,19 +24,19 @@ namespace SurveyBasket.API.Controllers
 
         [HttpGet]
         [HasPermission(Permissions.GetQuestions)]
-        public async Task<IActionResult> GetListByPollId(int pollId , [FromBody] RequestFillters fillters)
+        public async Task<IActionResult> GetListByPollId(int pollId, [FromBody] RequestFillters fillters)
         {
             var result = await _questionService.GetListByPollId(pollId, fillters);
-            if(result.Status == 200)
+            if (result.Status == 200)
                 return Ok(result);
             return NotFound(result);
         }
 
         [HttpGet("GetByPollId")]
         [HasPermission(Permissions.GetQuestions)]
-        public async Task<IActionResult> GetByPollId(int pollId , int id)
+        public async Task<IActionResult> GetByPollId(int pollId, int id)
         {
-            var result = await _questionService.GetByPollId(pollId , id);
+            var result = await _questionService.GetByPollId(pollId, id);
             if (result.Status == 200)
                 return Ok(result);
             return NotFound(result);
@@ -47,9 +44,9 @@ namespace SurveyBasket.API.Controllers
 
         [HttpPut("ToggleStatus")]
         [HasPermission(Permissions.UpdateQuestions)]
-        public async Task<IActionResult> TogglePublishStatus(int pollId , int id)
+        public async Task<IActionResult> TogglePublishStatus(int pollId, int id)
         {
-            var result = await _questionService.ToggleStatusAsync(pollId , id);
+            var result = await _questionService.ToggleStatusAsync(pollId, id);
 
             if (result.Status == StatusCodes.Status200OK) return Ok(result);
             if (result.Status == StatusCodes.Status404NotFound) return NotFound(result);
@@ -58,13 +55,13 @@ namespace SurveyBasket.API.Controllers
 
         [HttpPut("Update")]
         [HasPermission(Permissions.UpdateQuestions)]
-        public async Task<IActionResult> UpdateAsync(int pollId, int id , [FromBody]  QuestionRequest request)
+        public async Task<IActionResult> UpdateAsync(int pollId, int id, [FromBody] QuestionRequest request)
         {
             var result = await _questionService.UpdateAsync(pollId, id, request);
 
             if (result.Status == StatusCodes.Status200OK) return Ok(result);
             if (result.Status == StatusCodes.Status404NotFound) return NotFound(result);
-            return BadRequest(result);      
+            return BadRequest(result);
         }
     }
 }

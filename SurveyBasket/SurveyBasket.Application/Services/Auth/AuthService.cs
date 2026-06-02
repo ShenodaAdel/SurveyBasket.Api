@@ -6,7 +6,6 @@ using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Auth.JWT;
 using SurveyBasket.Application.Services.Email;
-using SurveyBasket.Domain.Entities;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -139,7 +138,7 @@ namespace SurveyBasket.Application.Services.Auth
             var userRoles = await _userManager.GetRolesAsync(user);
             var userPermissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, userRoles);
 
-            var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles, userPermissions    );
+            var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles, userPermissions);
 
             var refreshToken = GenerateRefreshToken();
 
@@ -264,7 +263,7 @@ namespace SurveyBasket.Application.Services.Auth
                 );
             }
 
-            await _userManager.AddToRoleAsync(user, DefaultRoles.User);
+            await _userManager.AddToRoleAsync(user, DefaultRoles.User.Name);
 
             messages.Add(new ApiResponseMessage("success", "Email Confirmation", "Email confirmed successfully. You can now log in."));
             return new ApiResponse<object?>(
@@ -311,7 +310,7 @@ namespace SurveyBasket.Application.Services.Auth
             var messages = new List<ApiResponseMessage>();
 
             if (await _userManager.FindByEmailAsync(request.Email) is not { } user || !user.EmailConfirmed)
-            { 
+            {
                 messages.Add(new ApiResponseMessage("Success", "Reset Password", "Check Your Email!"));
                 return new ApiResponse<object?>(
                     status: StatusCodes.Status200OK,

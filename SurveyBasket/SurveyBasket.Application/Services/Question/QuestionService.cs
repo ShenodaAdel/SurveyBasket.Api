@@ -6,15 +6,15 @@ using SurveyBasket.Application.Services.Question.Dtos;
 
 namespace SurveyBasket.Application.Services.Question
 {
-    public class QuestionService(IUnitOfWork unitOfWork , ICacheService cacheService
-        , ILogger<QuestionService> logger ) 
+    public class QuestionService(IUnitOfWork unitOfWork, ICacheService cacheService
+        , ILogger<QuestionService> logger)
         : IQuestionService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly ILogger<QuestionService> _logger = logger;
         private readonly ICacheService _cacheService = cacheService;
 
-        public async Task<ApiResponse<object?>> CreateAsync(int pollId , QuestionRequest request , CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<object?>> CreateAsync(int pollId, QuestionRequest request, CancellationToken cancellationToken = default)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -52,7 +52,7 @@ namespace SurveyBasket.Application.Services.Question
                 messages: messages);
         }
 
-        public async Task<ApiResponse<object?>> UpdateAsync(int pollId  , int id , QuestionRequest request)
+        public async Task<ApiResponse<object?>> UpdateAsync(int pollId, int id, QuestionRequest request)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -64,7 +64,7 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var questionIsExists =  await _unitOfWork.QuestionRepository.CheckIsExistWithSameContentBYPollIdAsync(request.Content, pollId, id);
+            var questionIsExists = await _unitOfWork.QuestionRepository.CheckIsExistWithSameContentBYPollIdAsync(request.Content, pollId, id);
 
             if (questionIsExists)
             {
@@ -76,7 +76,7 @@ namespace SurveyBasket.Application.Services.Question
 
             var question = await _unitOfWork.QuestionRepository.GetByPollIdAndIdAsync(pollId, id);
 
-            if(question == null)
+            if (question == null)
             {
                 messages.Add(new ApiResponseMessage("error", "Id", $"No Question found with Id."));
                 return new ApiResponse<object?>(
@@ -86,7 +86,7 @@ namespace SurveyBasket.Application.Services.Question
 
             question.Content = request.Content;
 
-            var currentAnswers = question.Answers.Select(answer => answer.Content).ToList(); 
+            var currentAnswers = question.Answers.Select(answer => answer.Content).ToList();
 
             // add new Answers in DB 
             var newAnswers = request.Answers.Except(currentAnswers).ToList();
@@ -96,7 +96,8 @@ namespace SurveyBasket.Application.Services.Question
                 question.Answers.Add(new Domain.Entities.Answer { Content = answer });
             });
 
-            question.Answers.ToList().ForEach(answer => { 
+            question.Answers.ToList().ForEach(answer =>
+            {
                 answer.IsDeleted = request.Answers.Contains(answer.Content);
             });
             await _unitOfWork.SaveChangesAsync();
@@ -179,7 +180,7 @@ namespace SurveyBasket.Application.Services.Question
             }
             _logger.LogInformation("Cache miss for key: {CacheKey}. Fetching questions from database.", cacheKey);
 
-            var query = _unitOfWork.QuestionRepository.GetListByPollId(pollId,fillters);
+            var query = _unitOfWork.QuestionRepository.GetListByPollId(pollId, fillters);
             var questions = await PaginatedList<QuestionResponse>.CreateAsync(query, fillters.PageNumber, fillters.PageSize, cancellationToken);
 
             if (questions.TotalCount == 0)
@@ -198,7 +199,7 @@ namespace SurveyBasket.Application.Services.Question
                 status: StatusCodes.Status200OK,
                 messages: messages);
         }
-        public async Task<ApiResponse<object?>> GetByPollId(int pollId , int id )
+        public async Task<ApiResponse<object?>> GetByPollId(int pollId, int id)
         {
             var messages = new List<ApiResponseMessage>();
 
@@ -212,7 +213,7 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var question = await _unitOfWork.QuestionRepository.GetByPollIdAsync(pollId,id);
+            var question = await _unitOfWork.QuestionRepository.GetByPollIdAsync(pollId, id);
 
             if (question == null)
             {
@@ -229,11 +230,11 @@ namespace SurveyBasket.Application.Services.Question
                 messages: messages);
         }
 
-        public async Task<ApiResponse<object?>> ToggleStatusAsync(int pollId , int id )
+        public async Task<ApiResponse<object?>> ToggleStatusAsync(int pollId, int id)
         {
             var messages = new List<ApiResponseMessage>();
 
-            if (pollId <= 0 || id <= 0 )
+            if (pollId <= 0 || id <= 0)
             {
                 messages.Add(new ApiResponseMessage("validation", "Id and Poll Id", $"PollId and QuestionId are Required."));
                 return new ApiResponse<object?>(
@@ -241,7 +242,7 @@ namespace SurveyBasket.Application.Services.Question
                     messages: messages);
             }
 
-            var question = await _unitOfWork.QuestionRepository.GetByPollIdAndIdAsync(pollId,id);
+            var question = await _unitOfWork.QuestionRepository.GetByPollIdAndIdAsync(pollId, id);
 
             if (question == null)
             {

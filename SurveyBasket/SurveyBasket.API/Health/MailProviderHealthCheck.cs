@@ -16,9 +16,9 @@ namespace SurveyBasket.API.Health
                 await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password, cancellationToken);
                 return await Task.FromResult(HealthCheckResult.Healthy("Mail provider is healthy"));
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                return await Task.FromResult(HealthCheckResult.Unhealthy(exception:ex));
+                return await Task.FromResult(HealthCheckResult.Unhealthy(exception: ex));
             }
         }
     }

@@ -9,17 +9,17 @@ namespace SurveyBasket.Infrastructure.Persistence.EntitiesConfigrations
             builder.HasData([
                 new ApplicationRole
                 {
-                    Id = DefaultRoles.AdminRoleId,
-                    Name = DefaultRoles.Admin,
-                    NormalizedName = DefaultRoles.Admin.ToUpper(),
-                    ConcurrencyStamp = DefaultRoles.AdminConcurrencyStamp,
+                    Id = DefaultRoles.Admin.Id,
+                    Name = DefaultRoles.Admin.Name,
+                    NormalizedName = DefaultRoles.Admin.Name.ToUpper(),
+                    ConcurrencyStamp = DefaultRoles.Admin.ConcurrencyStamp,
                 },
                 new ApplicationRole
                 {
-                    Id = DefaultRoles.UserRoleId,
-                    Name = DefaultRoles.User,
-                    NormalizedName = DefaultRoles.User.ToUpper(),
-                    ConcurrencyStamp = DefaultRoles.UserConcurrencyStamp,
+                    Id = DefaultRoles.User.Id,
+                    Name = DefaultRoles.User.Name,
+                    NormalizedName = DefaultRoles.User.Name.ToUpper(),
+                    ConcurrencyStamp = DefaultRoles.User.ConcurrencyStamp,
                     IsDefault = true,
                 }
             ]);

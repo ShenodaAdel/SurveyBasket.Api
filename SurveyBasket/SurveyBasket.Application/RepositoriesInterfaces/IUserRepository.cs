@@ -6,7 +6,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
 {
     public interface IUserRepository
     {
-        Task<AuthResponse?> ValidateUserAsync( string email , string password );
+        Task<AuthResponse?> ValidateUserAsync(string email, string password);
         void AddRefreshToken(ApplicationUser user, string token, DateTime refreshTokenExpiration);
         Task UpdateUser(string email);
         Task<bool> CheckExistUser(string email);
@@ -17,7 +17,7 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
         Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token);
         Task<ApplicationUser?> GetUserByEmailAsync(string email);
 
-        Task<IEnumerable<string>>GetAllPermissionsAsync(ApplicationUser user, IEnumerable<string> roles);
+        Task<IEnumerable<string>> GetAllPermissionsAsync(ApplicationUser user, IEnumerable<string> roles);
         Task<IEnumerable<UserResponse>> GetAllAsync();
     }
 }

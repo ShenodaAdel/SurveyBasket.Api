@@ -1,12 +1,10 @@
-using Microsoft.AspNetCore.Identity;
 using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Auth.Dtos;
 using SurveyBasket.Application.Services.Users.Dtos;
-using SurveyBasket.Domain.Entities;
 
 namespace SurveyBasket.Infrastructure.Repositories
 {
-    public class UserRepository( ApplicationDbContext context, UserManager<ApplicationUser> userManager) : IUserRepository
+    public class UserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : IUserRepository
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -33,9 +31,9 @@ namespace SurveyBasket.Infrastructure.Repositories
             };
         }
 
-        public async Task<ApplicationUser?> GetUserByEmaiAndPasswordlAsync(string email , string password)
+        public async Task<ApplicationUser?> GetUserByEmaiAndPasswordlAsync(string email, string password)
         {
-            var user =  await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
             return user is not null && await _userManager.CheckPasswordAsync(user, password) ? user : null;
         }
 
@@ -76,13 +74,13 @@ namespace SurveyBasket.Infrastructure.Repositories
         }
         public async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token)
         {
-                return await _userManager.ConfirmEmailAsync(user, token);
+            return await _userManager.ConfirmEmailAsync(user, token);
         }
         public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
         }
-        public async Task<IEnumerable<string>> GetAllPermissionsAsync(ApplicationUser user , IEnumerable<string> roles)
+        public async Task<IEnumerable<string>> GetAllPermissionsAsync(ApplicationUser user, IEnumerable<string> roles)
         {
             //var userPermissions = await _context.Roles
             //    .Join(_context.RoleClaims, 
@@ -109,11 +107,11 @@ namespace SurveyBasket.Infrastructure.Repositories
         {
             return await (
                 from u in _context.Users
-                join ur in _context.UserRoles 
+                join ur in _context.UserRoles
                 on u.Id equals ur.UserId
-                join r in _context.Roles 
+                join r in _context.Roles
                 on ur.RoleId equals r.Id into roles
-                where !roles.Any(role => role.Name == DefaultRoles.User)
+                where !roles.Any(role => role.Name == DefaultRoles.User.Name)
                 select new
                 {
                     u.Id,
@@ -123,7 +121,7 @@ namespace SurveyBasket.Infrastructure.Repositories
                     u.IsDisabled,
                     Roles = roles.Select(role => role.Name!).ToList()
                 })
-                .GroupBy( u => new { u.Id , u.FirstName ,u.LastName , u.Email , u.IsDisabled})
+                .GroupBy(u => new { u.Id, u.FirstName, u.LastName, u.Email, u.IsDisabled })
                 .Select(u => new UserResponse
                     (
                         u.Key.Id,
@@ -133,6 +131,6 @@ namespace SurveyBasket.Infrastructure.Repositories
                         u.Key.IsDisabled,
                         u.SelectMany(r => r.Roles)
                     )).ToListAsync();
-        } 
+        }
     }
 }

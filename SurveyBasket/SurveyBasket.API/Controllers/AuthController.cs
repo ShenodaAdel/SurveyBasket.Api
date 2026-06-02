@@ -51,7 +51,7 @@ namespace SurveyBasket.API.Controllers
         }
 
         [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgetPasswordAsync([FromBody]ForgetPasswordRequest request)
+        public async Task<IActionResult> ForgetPasswordAsync([FromBody] ForgetPasswordRequest request)
         {
             var response = await _authService.SendResetPasswordCodeAsync(request);
             return StatusCode(response.Status, response);

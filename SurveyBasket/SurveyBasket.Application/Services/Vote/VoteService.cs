@@ -1,5 +1,4 @@
 ﻿using SurveyBasket.Application.Services.Vote.Dtos;
-using System.Reflection;
 
 namespace SurveyBasket.Application.Services.Vote
 {
@@ -13,7 +12,7 @@ namespace SurveyBasket.Application.Services.Vote
 
             var hasVote = await _unitOfWork.VoteRepository.CheckUserVoted(userId, pollId);
 
-            if (hasVote) 
+            if (hasVote)
             {
                 messages.Add(new ApiResponseMessage("error", "User has already voted on this poll."));
                 return new ApiResponse<object?>(

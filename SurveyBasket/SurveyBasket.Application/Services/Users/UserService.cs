@@ -1,19 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SurveyBasket.Application.Helpers;
 using SurveyBasket.Application.Services.Role;
 using SurveyBasket.Application.Services.Role.Dtos;
 using SurveyBasket.Application.Services.Users.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SurveyBasket.Application.Services.Users
 {
     public class UserService(UserManager<ApplicationUser> userManager, IRoleService roleService
-        ,IUnitOfWork unitOfWork) : IUserService
+        , IUnitOfWork unitOfWork) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IRoleService _roleService = roleService;
@@ -197,7 +191,7 @@ namespace SurveyBasket.Application.Services.Users
             user.EmailConfirmed = true;
 
             var result = await _userManager.CreateAsync(user, request.Password);
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                 {
@@ -284,7 +278,7 @@ namespace SurveyBasket.Application.Services.Users
 
             var user = await _userManager.FindByIdAsync(id);
 
-            if (user == null )
+            if (user == null)
             {
                 messages.Add(new ApiResponseMessage("info", "No user found."));
                 return new ApiResponse<object?>(
