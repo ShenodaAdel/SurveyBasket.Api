@@ -79,13 +79,6 @@ namespace SurveyBasket.API.Controllers
             return StatusCode(response.Status, response);
         }
 
-        [HttpGet("test")]
-        [EnableRateLimiting("ConcurrencyLimiter")]
-        public async Task<IActionResult> TestAsync()
-        {
-            Thread.Sleep(5000);
-            return Ok("Test successful!");
-        }
     }
 
 }
