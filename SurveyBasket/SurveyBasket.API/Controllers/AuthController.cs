@@ -21,12 +21,6 @@ namespace SurveyBasket.API.Controllers
             return StatusCode(response.Status, response);
         }
 
-        [HttpPost("registerAutomation")]
-        public async Task<IActionResult> RegisterAutomationAsync(RegisterRequest request, CancellationToken cancellationToken = default)
-        {
-            var response = await _authService.RegisterAutoAsync(request, cancellationToken);
-            return StatusCode(response.Status, response);
-        }
 
         [HttpPost("register")]
         [DisableRateLimiting]

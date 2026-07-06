@@ -206,7 +206,6 @@ internal class Program
 
         app.UseSerilogRequestLogging();
 
-        app.UseHttpsRedirection();
 
         app.UseHangfireDashboard("/jobs", new DashboardOptions
         {
@@ -229,6 +228,7 @@ internal class Program
 
         // must me put before Authorization
         app.UseCors();
+        app.UseHttpsRedirection();
 
         app.UseExceptionHandler();
 
@@ -240,6 +240,7 @@ internal class Program
         app.MapControllers();
         //app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+        app.UseStaticFiles();
         app.MapHealthChecks("health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

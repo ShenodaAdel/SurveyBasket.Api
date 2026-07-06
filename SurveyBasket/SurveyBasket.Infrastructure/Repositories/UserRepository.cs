@@ -132,5 +132,9 @@ namespace SurveyBasket.Infrastructure.Repositories
                         u.SelectMany(r => r.Roles)
                     )).ToListAsync();
         }
+        public async Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+        {
+            return await _userManager.AddToRoleAsync(user, role);
+        }
     }
 }

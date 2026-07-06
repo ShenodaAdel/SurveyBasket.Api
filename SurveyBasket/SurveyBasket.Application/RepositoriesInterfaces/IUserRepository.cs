@@ -19,5 +19,6 @@ namespace SurveyBasket.Application.RepositoriesInterfaces
 
         Task<IEnumerable<string>> GetAllPermissionsAsync(ApplicationUser user, IEnumerable<string> roles);
         Task<IEnumerable<UserResponse>> GetAllAsync();
+        Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role);
     }
 }

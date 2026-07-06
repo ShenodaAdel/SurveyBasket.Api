@@ -1,0 +1,3 @@
+# This file keeps the wwwroot folder in source control.
+# app.UseStaticFiles() requires the wwwroot directory to exist at startup,
+# otherwise the app throws System.IO.DirectoryNotFoundException.

@@ -101,72 +101,6 @@ namespace SurveyBasket.Application.Services.Auth
 
         }
 
-        public async Task<ApiResponse<object?>> RegisterAutoAsync(RegisterRequest request, CancellationToken cancellationToken = default)
-        {
-            var messages = new List<ApiResponseMessage>();
-
-            var existingUser = await _unitOfWork.UserRepository.CheckExistUser(request.Email);
-            if (existingUser)
-            {
-                messages.Add(new ApiResponseMessage("error", "Registration", "Email is already in use."));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages);
-            }
-
-            var user = new ApplicationUser
-            {
-                Email = request.Email,
-                UserName = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
-
-            var result = await _unitOfWork.UserRepository.CreateUserByPasswordAsync(user, request.Password);
-
-            if (!result.Succeeded)
-            {
-                messages.AddRange(result.Errors.Select(error =>
-                    new ApiResponseMessage("error", "Registration", error.Description)
-                ));
-                return new ApiResponse<object?>(
-                    status: StatusCodes.Status400BadRequest,
-                    messages: messages
-                );
-            }
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var userPermissions = await _unitOfWork.UserRepository.GetAllPermissionsAsync(user, userRoles);
-
-            var (token, expiresIn) = _jWTProvider.GenerateToken(user, userRoles, userPermissions);
-
-            var refreshToken = GenerateRefreshToken();
-
-            var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
-
-            _unitOfWork.UserRepository.AddRefreshToken(user!, refreshToken, refreshTokenExpiration);
-            await _unitOfWork.SaveChangesAsync();
-
-            var authResponse = new AuthResponse
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Token = token,
-                ExpiresIn = expiresIn,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiration = refreshTokenExpiration
-            };
-
-            messages.Add(new ApiResponseMessage("success", "Registration", "User registered successfully."));
-            return new ApiResponse<object?>(
-                data: authResponse,
-                status: StatusCodes.Status200OK,
-                messages: messages
-            );
-        }
-
         public async Task<ApiResponse<object?>> RegisterAsync(RegisterRequest request)
         {
             var messages = new List<ApiResponseMessage>();
@@ -396,8 +330,8 @@ namespace SurveyBasket.Application.Services.Auth
 
         private async Task SendConfirmationEmail(ApplicationUser user, string code)
         {
-            // the frontend must send me a this link 
-            var confirmUrl = $"http://localhost:5173/confirm-email?userId={user.Id}&code={code}";
+            var origin = _httpContextAccessor.HttpContext!.Request.Headers["Origin"].ToString();
+            var confirmUrl = $"{origin}/confirm-email?userId={user.Id}&code={code}";
 
             var emailBody = EmailBodyBuilder.BuildEmailConfirmationBody("EmailConfirmation",
                 new Dictionary<string, string>
